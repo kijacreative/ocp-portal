@@ -1,0 +1,15 @@
+<header class="hq-top">
+  <div class="hq-top__in">
+    <a class="hq-top__mark" href="#today">
+      <img class="logo-puck" src="/img/logo-puck.png" alt="" width="36" height="36">
+      <b>Trainer HQ</b>
+    </a>
+    <span class="hq-top__tag">Internal — trainers only</span>
+    <div class="hq-who">
+      <img class="hq-who__face" src="{{user_pic}}" alt="" width="30" height="30"
+           onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'hq-who__face',textContent:'{{user_initial}}'}))">
+      <span class="hq-who__name">{{user_name}}</span>
+      <a href="/api/auth/logout">Sign out</a>
+    </div>
+  </div>
+</header>

@@ -1,0 +1,6 @@
+# Source and tooling are never served. Without this Vercel deploys every file
+# in the project, and src/page.html — which carries pay rates, the trainer
+# promo code and the bonus scheme — would be fetchable without signing in.
+src/
+tools/
+*.md

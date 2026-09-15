@@ -1,0 +1,202 @@
+/* Oak Cliff Pilates — design tokens
+   Source of truth: Claude Design project "Oak Cliff Pilates"
+   → _ds/oak-cliff-pilates-design-system-d090e5bc-.../tokens/*.css
+   Keep this file in sync with the design system. Do not invent values here. */
+
+/* ══ COLORS ═══════════════════════════════════════════════════════════ */
+:root{
+/* ── Base palette ─────────────────────────────────────────── */
+--ocp-black:#0B0B0B;          /* signature surface — never pure #000 */
+--ocp-ink:#161514;            /* large dark surfaces, one step up from black */
+--ocp-gold:#C9A24A;           /* signature accent */
+--ocp-gold-warm:#E9C977;      /* highlights */
+--ocp-gold-deep:#8E6B2A;      /* eyebrows, shadowed edge of the foil */
+--ocp-copper:#B26A3C;         /* alt finish · rare */
+--ocp-cream:#F4EFE6;          /* default light */
+--ocp-paper:#FBF8F2;          /* warm paper */
+--ocp-white:#FFFFFF;
+
+/* Neutral ramp — warm greys derived between black and cream */
+--ocp-grey-900:#1C1B19;
+--ocp-grey-800:#26241F;
+--ocp-grey-700:#3A372F;
+--ocp-grey-600:#57534A;
+--ocp-grey-500:#7C766B;
+--ocp-grey-400:#A8A19A;
+--ocp-grey-300:#CFC9C0;
+--ocp-grey-200:#E4DED4;
+
+/* Event-creative accents ONLY — Happy Hour, Galentine's, badge moments.
+   Never part of an everyday layout. One neon moment per layout, max. */
+--ocp-neon-pink:#E63995;
+--ocp-hot-red:#E91E2D;
+--ocp-electric:#2E7BFF;
+
+/* ── Signature treatment ──────────────────────────────────── */
+/* 5-stop foil. Type and thin strokes only — never a large fill. */
+--ocp-gold-foil:linear-gradient(100deg,#8E6B2A 0%,#C9A24A 20%,#FAE19D 45%,#C9A24A 72%,#8E6B2A 100%);
+--ocp-gold-foil-vertical:linear-gradient(180deg,#8E6B2A 0%,#C9A24A 20%,#FAE19D 45%,#C9A24A 72%,#8E6B2A 100%);
+/* Bottom-up protection gradient for type over photography — not a flat overlay. */
+--ocp-photo-scrim:linear-gradient(to top,rgba(11,11,11,.92) 0%,rgba(11,11,11,.72) 26%,rgba(11,11,11,.28) 58%,rgba(11,11,11,0) 100%);
+
+/* ── Semantic aliases (dark is the default context) ───────── */
+--surface-page:var(--ocp-black);
+--surface-raised:var(--ocp-ink);
+--surface-card:#111110;
+--surface-inset:#0D0D0C;
+--surface-light:var(--ocp-cream);
+--surface-light-raised:var(--ocp-paper);
+
+--text-primary:var(--ocp-cream);
+--text-secondary:var(--ocp-grey-400);
+--text-muted:var(--ocp-grey-500);
+--text-accent:var(--ocp-gold);
+--text-eyebrow:var(--ocp-gold-deep);
+--text-on-light:var(--ocp-black);
+--text-on-light-secondary:var(--ocp-grey-600);
+--text-on-gold:var(--ocp-black);
+
+--border-hairline:rgba(201,162,74,.28);   /* the gold rule that frames every page */
+--border-subtle:rgba(244,239,230,.12);
+--border-strong:var(--ocp-gold);
+--border-on-light:rgba(11,11,11,.14);
+
+--action-primary-bg:var(--ocp-gold);
+--action-primary-fg:var(--ocp-black);
+--action-primary-bg-hover:var(--ocp-gold-warm);
+--action-secondary-fg:var(--ocp-cream);
+--action-disabled-bg:var(--ocp-grey-800);
+--action-disabled-fg:var(--ocp-grey-600);
+
+--focus-ring:var(--ocp-gold-warm);
+--status-danger:var(--ocp-hot-red);
+--status-live:var(--ocp-neon-pink);
+}
+
+/* ══ TYPOGRAPHY ═══════════════════════════════════════════════════════ */
+:root{
+/* ── Families ─────────────────────────────────────────────── */
+--font-display:"Khand","Oswald","Arial Narrow",sans-serif;      /* the wordmark voice — ALWAYS uppercase, set tight */
+--font-body:"Montserrat",system-ui,-apple-system,sans-serif;     /* the workhorse */
+--font-feature:"Big Shoulders Display","Khand",sans-serif;       /* SUBSTITUTE for Segment — wide modernist headers, sparingly */
+--font-script:"Yellowtail",cursive;                              /* SUBSTITUTE for Majesty — one neon/script moment per layout, max */
+
+/* ── Weights ──────────────────────────────────────────────── */
+--fw-light:300; --fw-regular:400; --fw-medium:500; --fw-semibold:600; --fw-bold:700; --fw-black:900;
+
+/* ── Display scale (Khand, uppercase, tight) ──────────────── */
+--type-display-hero:clamp(3.5rem,9vw,7.5rem);  /* 56 → 120 */
+--type-display-1:4.5rem;   /* 72 */
+--type-display-2:3.5rem;   /* 56 */
+--type-display-3:2.5rem;   /* 40 */
+--type-display-4:1.75rem;  /* 28 */
+--type-display-5:1.375rem; /* 22 */
+
+/* ── Body scale (Montserrat) ──────────────────────────────── */
+--type-body-lg:1.125rem;   /* 18 */
+--type-body:1rem;          /* 16 */
+--type-body-sm:0.875rem;   /* 14 */
+--type-caption:0.8125rem;  /* 13 */
+--type-eyebrow:0.75rem;    /* 12 */
+--type-micro:0.6875rem;    /* 11 */
+
+/* ── Line heights ─────────────────────────────────────────── */
+--lh-display:0.88;         /* headlines stack tight, almost touching */
+--lh-display-loose:0.95;
+--lh-heading:1.08;
+--lh-body:1.62;
+--lh-tight:1.35;
+
+/* ── Tracking ─────────────────────────────────────────────── */
+--ls-display:-0.015em;     /* Khand set tight */
+--ls-heading:0;
+--ls-body:0;
+--ls-eyebrow:0.18em;       /* letterspaced label caps */
+--ls-eyebrow-wide:0.3em;
+--ls-button:0.08em;
+
+/* ── Composed roles ───────────────────────────────────────── */
+--text-style-hero:var(--fw-bold) var(--type-display-hero)/var(--lh-display) var(--font-display);
+--text-style-h1:var(--fw-bold) var(--type-display-1)/var(--lh-display) var(--font-display);
+--text-style-h2:var(--fw-bold) var(--type-display-2)/var(--lh-display) var(--font-display);
+--text-style-h3:var(--fw-semibold) var(--type-display-3)/var(--lh-heading) var(--font-display);
+--text-style-h4:var(--fw-semibold) var(--type-display-4)/var(--lh-heading) var(--font-display);
+--text-style-body:var(--fw-regular) var(--type-body)/var(--lh-body) var(--font-body);
+--text-style-body-bold:var(--fw-bold) var(--type-body)/var(--lh-body) var(--font-body);
+--text-style-eyebrow:var(--fw-bold) var(--type-eyebrow)/1.3 var(--font-body);
+--text-style-button:var(--fw-semibold) var(--type-body-sm)/1 var(--font-display);
+}
+
+/* ══ SPACING ══════════════════════════════════════════════════════════ */
+:root{
+/* 4px base, editorial jumps at the top end */
+--space-0:0; --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px;
+--space-5:20px; --space-6:24px; --space-8:32px; --space-10:40px; --space-12:48px;
+--space-16:64px; --space-20:80px; --space-24:96px; --space-32:128px; --space-40:160px;
+
+/* Layout */
+--layout-gutter:24px;
+--layout-gutter-lg:48px;
+--layout-max:1280px;
+--layout-max-prose:68ch;
+--layout-section-y:var(--space-24);
+--layout-section-y-sm:var(--space-16);
+
+/* The framed-page motif: every brand-kit page sits inside a gold hairline
+   inset from the trim by this amount. */
+--frame-inset:24px;
+
+/* Component density */
+--control-height-sm:36px;
+--control-height:44px;   /* minimum touch target */
+--control-height-lg:56px;
+--control-pad-x:20px;
+--control-pad-x-lg:28px;
+--card-pad:24px;
+--card-pad-lg:32px;
+}
+
+/* ══ EFFECTS ══════════════════════════════════════════════════════════ */
+:root{
+/* ── Radii — squared-off and architectural. Pills are for phrase chips only. */
+--radius-0:0;
+--radius-sm:2px;
+--radius-md:4px;
+--radius-lg:8px;   /* photo tiles, logo lockup cards */
+--radius-pill:999px;
+
+/* ── Borders ───────────────────────────────────────────────── */
+--border-width:1px;
+--border-width-thick:2px;
+--rule-gold:1px solid var(--border-hairline);
+--rule-subtle:1px solid var(--border-subtle);
+
+/* ── Shadows — restrained. Depth comes from value, not blur. ── */
+--shadow-none:none;
+--shadow-card:0 1px 0 rgba(244,239,230,.04) inset;
+--shadow-raised:0 12px 32px -12px rgba(0,0,0,.85);
+--shadow-modal:0 40px 80px -20px rgba(0,0,0,.9);
+/* The one glow in the system: the puck's emboss halo. Mark only. */
+--glow-gold:0 0 48px rgba(201,162,74,.28);
+--glow-gold-tight:0 0 18px rgba(201,162,74,.35);
+--glow-neon-pink:0 0 24px rgba(230,57,149,.55);
+
+/* ── Motion — quick, confident, no bounce ─────────────────── */
+--ease-out:cubic-bezier(.2,.7,.3,1);
+--ease-in-out:cubic-bezier(.5,0,.3,1);
+--dur-fast:120ms;
+--dur:180ms;
+--dur-slow:320ms;
+--transition-control:background var(--dur) var(--ease-out),color var(--dur) var(--ease-out),border-color var(--dur) var(--ease-out),transform var(--dur-fast) var(--ease-out);
+
+/* ── Interaction ──────────────────────────────────────────── */
+--press-scale:0.985;
+--hover-lift:-1px;
+--focus-ring-width:2px;
+--focus-ring-offset:2px;
+
+/* ── Blur / transparency — sparing: sticky nav and modal veil only. */
+--veil:rgba(11,11,11,.72);
+--blur-nav:saturate(140%) blur(14px);
+--film-grain-opacity:0.05;
+}

@@ -1,0 +1,76 @@
+/* Oak Cliff Pilates — the base and the three components the portal uses.
+   Lifted verbatim from oakcliffpilates.com's css/site.css so this repo stands
+   alone. If a button or badge ever drifts from the main site, diff against that
+   file — it is the original, this is the only copy. */
+
+
+/* ── base ── */
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  margin:0;background:var(--surface-page);color:var(--text-primary);
+  font:var(--text-style-body);-webkit-font-smoothing:antialiased;
+}
+a{color:var(--text-primary);text-decoration:none;transition:color .18s var(--ease-out)}
+a:hover{color:var(--ocp-gold)}
+img{max-width:100%}
+:focus-visible{outline:var(--focus-ring-width) solid var(--focus-ring);outline-offset:var(--focus-ring-offset)}
+
+
+/* ── LogoPuck ── */
+.logo-puck{display:block;object-fit:contain}
+.logo-puck--glow{filter:drop-shadow(0 0 18px rgba(201,162,74,.35))}
+
+
+/* ── Badge ── */
+.badge{
+  display:inline-flex;align-items:center;height:22px;padding:0 8px;
+  font:var(--fw-bold) var(--type-micro)/1 var(--font-body);
+  text-transform:uppercase;letter-spacing:var(--ls-eyebrow);
+  border:var(--border-width) solid;border-radius:var(--radius-sm);white-space:nowrap;
+}
+.badge--gold{background:var(--ocp-gold);color:var(--ocp-black);border-color:var(--ocp-gold)}
+.badge--outline{background:transparent;color:var(--ocp-gold);border-color:var(--border-hairline)}
+.badge--cream{background:var(--ocp-cream);color:var(--ocp-black);border-color:var(--ocp-cream)}
+.badge--ink{background:var(--ocp-ink);color:var(--ocp-grey-300);border-color:var(--border-subtle)}
+.badge--neon{background:var(--ocp-neon-pink);color:var(--ocp-black);border-color:var(--ocp-neon-pink)}
+
+
+/* ── Button ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--space-2);
+  height:var(--control-height);padding:0 var(--control-pad-x);
+  font:var(--fw-semibold) .9375rem/1 var(--font-display);
+  text-transform:uppercase;letter-spacing:var(--ls-button);text-decoration:none;
+  border:var(--border-width) solid;border-radius:var(--radius-sm);
+  cursor:pointer;white-space:nowrap;transition:var(--transition-control);
+}
+.btn > span{padding-top:1px}
+.btn--sm{height:var(--control-height-sm);padding:0 14px;font-size:.8125rem}
+.btn--lg{height:var(--control-height-lg);padding:0 var(--control-pad-x-lg);font-size:1.0625rem}
+.btn--full{width:100%}
+.btn:active:not(:disabled){transform:scale(var(--press-scale))}
+.btn--primary{background:var(--ocp-gold);color:var(--ocp-black);border-color:var(--ocp-gold)}
+.btn--primary:hover:not(:disabled){background:var(--ocp-gold-warm);border-color:var(--ocp-gold-warm);color:var(--ocp-black)}
+.btn--secondary{background:transparent;color:var(--ocp-cream);border-color:var(--border-hairline)}
+.btn--secondary:hover:not(:disabled){background:rgba(201,162,74,.1);border-color:var(--ocp-gold);color:var(--ocp-gold-warm)}
+.btn--ghost{background:transparent;color:var(--ocp-cream);border-color:transparent;box-shadow:none}
+.btn--ghost:hover:not(:disabled){color:var(--ocp-gold)}
+.btn--on-light{background:var(--ocp-black);color:var(--ocp-cream);border-color:var(--ocp-black)}
+.btn--on-light:hover:not(:disabled){background:var(--ocp-grey-800);border-color:var(--ocp-grey-800);color:var(--ocp-gold-warm)}
+.btn--danger{background:var(--ocp-hot-red);color:var(--ocp-paper);border-color:var(--ocp-hot-red)}
+.btn--danger:hover:not(:disabled){background:#f7333f;border-color:#f7333f}
+.btn:disabled,.btn[aria-disabled="true"]{
+  background:var(--action-disabled-bg);color:var(--action-disabled-fg);
+  border-color:transparent;cursor:not-allowed;transform:none;
+}
+
+
+/* ── skip link ── */
+.skip{
+  position:absolute;left:-9999px;top:0;z-index:100;
+  padding:12px 20px;background:var(--ocp-gold);color:var(--ocp-black);
+  font:var(--fw-semibold) var(--type-body-sm)/1 var(--font-display);
+  text-transform:uppercase;letter-spacing:var(--ls-button);
+}
+.skip:focus{left:0}
