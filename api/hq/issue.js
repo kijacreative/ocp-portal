@@ -1,55 +1,66 @@
 'use strict';
-/* Post a studio issue to Slack, attributed to the signed-in trainer. */
-const { requireSession } = require('../_lib/session');
+/* Log a studio issue into the events workbook.
+ *
+ * This endpoint is public, because the page is. Two consequences are handled
+ * here rather than hoped away: every field is bounded, and one browser can
+ * only file a few reports a minute. The workbook is the destination, so the
+ * worst case is rows somebody deletes — not mail sent or money moved. */
 const { json } = require('../_lib/http');
-const slack = require('../_lib/slack');
 
 const LOCATIONS = ['Bishop Arts', 'Uptown', 'Lower Greenville'];
 const AREAS = ['Lobby & front desk', 'Reformer studio', 'Bathrooms', 'Equipment', 'Building & access', 'Something else'];
 
-module.exports = async function handler(req, res) {
-  const session = requireSession(req, res);
-  if (!session) return;
+const WINDOW = 60 * 1000;
+const PER_WINDOW = 4;
+const seen = new Map();
 
+function tooMany(req) {
+  const who = (req.headers['x-forwarded-for'] || 'unknown').split(',')[0].trim();
+  const now = Date.now();
+  const hits = (seen.get(who) || []).filter((at) => now - at < WINDOW);
+  hits.push(now);
+  seen.set(who, hits);
+  if (seen.size > 500) {
+    for (const [key, times] of seen) if (!times.some((at) => now - at < WINDOW)) seen.delete(key);
+  }
+  return hits.length > PER_WINDOW;
+}
+
+module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return json(res, 405, { error: 'Use POST.' });
-  if (!process.env.SLACK_BOT_TOKEN) {
-    return json(res, 503, { error: 'Slack is not connected yet — post it in #studio-issues instead.' });
+
+  const feed = process.env.EVENTS_FEED_URL;
+  if (!feed) {
+    return json(res, 503, { error: 'Not connected to the workbook yet — tell Charley directly for now.' });
+  }
+  if (tooMany(req)) {
+    return json(res, 429, { error: 'That is a lot of reports at once. Give it a minute.' });
   }
 
   const body = typeof req.body === 'object' && req.body ? req.body : {};
   const location = LOCATIONS.includes(body.location) ? body.location : null;
   const area = AREAS.includes(body.area) ? body.area : null;
   const detail = String(body.detail || '').trim().slice(0, 1500);
-  const urgent = body.urgent === true;
+  const reporter = String(body.reporter || '').trim().slice(0, 80);
 
+  if (!reporter) return json(res, 400, { error: 'Add your name so we know who to ask.' });
   if (!location) return json(res, 400, { error: 'Pick a studio.' });
   if (!area) return json(res, 400, { error: 'Pick what it relates to.' });
   if (detail.length < 10) return json(res, 400, { error: 'Add a sentence about what needs attention.' });
 
-  const channel = process.env.SLACK_ISSUES_CHANNEL || 'studio-issues';
-
   try {
-    const id = await slack.channelId(channel);
-    const heading = `${urgent ? ':rotating_light: ' : ''}${location} — ${area}`;
-    const result = await slack.post('chat.postMessage', {
-      channel: id,
-      text: `${heading}: ${detail}`,
-      blocks: [
-        { type: 'header', text: { type: 'plain_text', text: heading, emoji: true } },
-        { type: 'section', text: { type: 'plain_text', text: detail, emoji: false } },
-        {
-          type: 'context',
-          elements: [
-            {
-              type: 'mrkdwn',
-              text: `Reported by *${session.name}* from Trainer HQ${urgent ? ' · marked urgent' : ''}`,
-            },
-          ],
-        },
-      ],
+    const url = new URL(feed);
+    if (process.env.EVENTS_FEED_TOKEN) url.searchParams.set('token', process.env.EVENTS_FEED_TOKEN);
+    const response = await fetch(url.toString(), {
+      method: 'POST',
+      redirect: 'follow',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ location, area, detail, reporter, urgent: body.urgent === true }),
     });
-    return json(res, 200, { ok: true, ts: result.ts, channel });
+    const result = await response.json();
+    if (result.error) throw new Error(result.error);
+    return json(res, 200, { ok: true });
   } catch (err) {
-    return json(res, 502, { error: `Slack refused the post: ${err.message}` });
+    return json(res, 502, { error: `Could not log it: ${err.message}` });
   }
 };

@@ -1,15 +1,11 @@
 'use strict';
 /* Local dev server for Trainer HQ.
  *
- *   node tools/dev.js            # sign-in screen, then the real Slack flow
- *   node tools/dev.js --as "Kiel Jared"   # skip Slack, pretend to be signed in
+ *   node tools/dev.js
  *
- * Serves the repo statically, routes /trainer-hq and /api/* through the same
- * handlers Vercel runs, and applies the rewrite from vercel.json. Reads .env
- * if there is one, so the live Slack and events feeds work locally too.
- *
- * `--as` exists so the page can be worked on without a Slack app configured.
- * It only ever runs from this script, never on Vercel.
+ * Serves the repo statically and routes / and /api/* through the same handlers
+ * Vercel runs, applying the rewrites from vercel.json. Reads .env if there is
+ * one, so the live events feed works locally too.
  */
 const http = require('http');
 const fs = require('fs');
@@ -25,10 +21,7 @@ if (fs.existsSync(envPath)) {
     if (match && !process.env[match[1]]) process.env[match[1]] = match[2].replace(/^"|"$/g, '');
   });
 }
-if (!process.env.HQ_SESSION_SECRET) process.env.HQ_SESSION_SECRET = 'dev-only-not-a-real-secret';
 
-const asIndex = process.argv.indexOf('--as');
-const AS = asIndex > -1 ? process.argv[asIndex + 1] || 'Dev Trainer' : null;
 
 const TYPES = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
@@ -65,12 +58,6 @@ const server = http.createServer(async function (req, res) {
   const url = new URL(req.url, `http://localhost:${PORT}`);
   let route = url.pathname;
 
-  if (AS) {
-    const { sign, MAX_AGE, COOKIE } = load('api/_lib/session.js');
-    const token = sign({ uid: 'U-DEV', name: AS, pic: '', exp: Math.floor(Date.now() / 1000) + MAX_AGE });
-    req.headers.cookie = `${COOKIE}=${encodeURIComponent(token)}; ${req.headers.cookie || ''}`;
-  }
-
   if (route === '/' || route === '/trainer-hq') route = '/api/hq/page';
 
   if (route.startsWith('/api/')) {
@@ -98,5 +85,4 @@ const server = http.createServer(async function (req, res) {
 
 server.listen(PORT, function () {
   console.log(`Trainer HQ dev  →  http://localhost:${PORT}/`);
-  console.log(AS ? `Signed in as "${AS}" (--as)` : 'Not signed in — the sign-in screen will show.');
 });

@@ -1,6 +1,6 @@
 <!--
 title: Trainer HQ — Oak Cliff Pilates
-description: Internal trainer resource. Signed-in Slack members only.
+description: Internal trainer resource. Unlisted — not for clients.
 -->
 <!--#include head-->
 <body class="hq">
@@ -29,7 +29,7 @@ description: Internal trainer resource. Signed-in Slack members only.
   <!-- ══ 01 TODAY ═══════════════════════════════════════════════════ -->
   <section class="hq-hero" id="today">
     <div class="hq-eyebrow">Oak Cliff Pilates — internal</div>
-    <h1>Welcome back,<br><span>{{user_name}}</span></h1>
+    <h1>Trainer<br><span>HQ</span></h1>
     <p class="hq-hero__lede">Everything you need before you step on the floor. The class
       standard, what is on the calendar, and what we are pushing right now.</p>
     <div class="hq-quick">
@@ -45,15 +45,14 @@ description: Internal trainer resource. Signed-in Slack members only.
     <div class="hq-sec__head">
       <div class="hq-eyebrow">02 — From the office</div>
       <h2 class="hq-h2">Announcements</h2>
-      <p>The latest from <b>#general</b> in Slack, pulled straight through. Check it
-        before every shift.</p>
+      <p>Straight from the office. Check before every shift.</p>
       <p class="hq-live" id="hq-announcements-status"><span class="hq-live__dot"></span><span>Loading…</span></p>
     </div>
     <div class="hq-card hq-card--plain" id="hq-announcements">
       <div class="hq-skeleton"><div></div><div></div><div></div></div>
     </div>
-    <p class="hq-note" style="margin-top:12px">Posting something everyone needs? Put it in
-      <b>#general</b> and it appears here within a minute.</p>
+    <p class="hq-note" style="margin-top:12px">Something everyone needs to know? Add a row to
+      the <b>ANNOUNCEMENTS</b> tab in the events workbook and it shows up here.</p>
   </section>
 
   <!-- ══ 03 EVENTS ══════════════════════════════════════════════════ -->
@@ -533,12 +532,17 @@ description: Internal trainer resource. Signed-in Slack members only.
     <div class="hq-card" style="margin-top:22px" id="studio-issue">
       <div class="hq-eyebrow">Studio issues</div>
       <h3 class="hq-h3" style="margin:10px 0 0">Post anything that needs attention</h3>
-      <p class="hq-note" style="margin-top:12px">This posts straight into
-        <b>#studio-issues</b> in Slack under your name, so you do not have to switch apps
-        mid-shift. Got a photo? Add it as a reply in Slack — it usually explains more than
-        the words do.</p>
+      <p class="hq-note" style="margin-top:12px">This logs straight into the
+        <b>STUDIO ISSUES</b> tab in the events workbook, so it is written down the moment
+        you notice it rather than after your shift. Got a photo? Send it to Charley —
+        it usually explains more than the words do.</p>
 
       <form class="hq-form" id="hq-issue-form">
+        <div class="hq-field">
+          <label for="hq-name">Your name</label>
+          <input id="hq-name" name="reporter" type="text" required maxlength="80"
+            autocomplete="name" placeholder="So we know who to ask if it needs a follow-up">
+        </div>
         <div class="hq-row">
           <div class="hq-field">
             <label for="hq-loc">Studio</label>
@@ -570,7 +574,7 @@ description: Internal trainer resource. Signed-in Slack members only.
         <label class="hq-check"><input type="checkbox" name="urgent">
           Urgent — it affects classes today</label>
         <div class="hq-form__foot">
-          <button class="btn btn--primary" type="submit">Post to Slack</button>
+          <button class="btn btn--primary" type="submit">Log it</button>
           <span class="hq-say-status" id="hq-issue-status" role="status" aria-live="polite"></span>
         </div>
       </form>
@@ -605,7 +609,7 @@ description: Internal trainer resource. Signed-in Slack members only.
         <li>Get your Arketa trainer account from Charley, and sign in before your first shift.</li>
         <li>Read the <a href="https://docs.google.com/document/d/1qxPZ9cg-ST7CLNCK0TYsXTntPhKJD_P5Ir9E-gJal04/edit" target="_blank" rel="noopener">handbook</a> end to end.</li>
         <li>Register for parking at the studios you will teach at — see below.</li>
-        <li>Join Slack, and turn on notifications for <b>#general</b> and <b>#studio-issues</b>.</li>
+        <li>Join Slack and turn on notifications for <b>#general</b> — that is where the team talks.</li>
         <li>Remaining steps <span class="hq-tk">Needs content</span></li>
       </ol>
     </div>

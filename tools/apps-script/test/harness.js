@@ -63,7 +63,20 @@ function makeContext(book){
       const p=n=>String(n).padStart(2,'0');
       if(f==='yyyy-MM-dd')return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}`;
       if(f==='h:mm a'){let h=d.getHours();const ap=h<12?'AM':'PM';h=h%12||12;return `${h}:${p(d.getMinutes())} ${ap}`;}
-      return d.toISOString();
+      if(f==='yyyy-MM-dd HH:mm')return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())} ${p(d.getHours())}:${p(d.getMinutes())}`;
+      if(f==='MMM d, yyyy'){const m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+        return `${m[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;}
+      if(f==='EEE d MMM yyyy, h:mm a'){
+        const dow=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'][d.getDay()];
+        const mon=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'][d.getMonth()];
+        let h=d.getHours();const ap=h<12?'AM':'PM';h=h%12||12;
+        return `${dow} ${d.getDate()} ${mon} ${d.getFullYear()}, ${h}:${p(d.getMinutes())} ${ap}`;}
+      if(f==="yyyy-MM-dd'T'HH:mm:ssXXX")
+        return `${d.getFullYear()}-${p(d.getMonth()+1)}-${p(d.getDate())}T${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}-05:00`;
+      // Anything else is a format the script uses but the harness has not been
+      // taught — fail loudly rather than quietly returning an ISO string that
+      // would make a test pass against output the real Sheets never produces.
+      throw new Error('harness: unsupported date format '+f);
     }},
     ContentService:{createTextOutput:t=>({setMimeType:()=>t}),MimeType:{JSON:'json'}},
     ScriptApp:{getProjectTriggers:()=>[],newTrigger:()=>({timeBased:()=>({everyHours:()=>({create:()=>{}})})}),deleteTrigger:()=>{}},

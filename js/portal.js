@@ -1,17 +1,17 @@
 /* Oak Cliff Pilates — Trainer HQ
-   Side-nav scrollspy, accordions, and the three live panels: announcements
-   from Slack, events from the workbook, and the membership count.
+   Side-nav scrollspy, accordions, and the live panels: announcements, events
+   and the membership count, all from one read of the events workbook.
 
    Everything here talks to /api/hq/* on this origin. Those endpoints hold the
-   credentials and refuse anyone without a session, so this file carries no
-   secrets and can do nothing a signed-out browser could not already do. */
+   workbook URL and its token, so this file carries no secrets — the browser
+   never learns where the data actually comes from. */
 (function () {
   'use strict';
 
   var $ = function (sel, root) { return (root || document).querySelector(sel); };
   var $$ = function (sel, root) { return Array.prototype.slice.call((root || document).querySelectorAll(sel)); };
 
-  /* Text from Slack or the events sheet is data, never markup. */
+  /* Text from the events sheet is data, never markup. */
   function esc(value) {
     return String(value == null ? '' : value)
       .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
@@ -75,52 +75,48 @@
   }
 
   /* ── Announcements ───────────────────────────────────────────────── */
-  function announcements() {
+  function announcements(data) {
     var box = $('#hq-announcements');
     if (!box) return;
     var light = $('#hq-announcements-status');
 
-    fetch('/api/hq/slack?limit=4', { credentials: 'same-origin' })
-      .then(function (r) { return r.json(); })
-      .then(function (data) {
-        if (data.configured === false) {
-          box.innerHTML =
-            '<div class="hq-empty">Slack is not connected yet. Until it is, ' +
-            'announcements live in <b>#general</b> in Slack.</div>';
-          status(light, false, 'Not connected');
-          return;
-        }
-        if (data.error || !data.posts || !data.posts.length) {
-          box.innerHTML =
-            '<div class="hq-empty">Nothing to show from <b>#' + esc(data.channel || 'general') +
-            '</b> right now.' + (data.error ? '<br><small>' + esc(data.error) + '</small>' : '') + '</div>';
-          status(light, !data.error, data.error ? 'Feed error' : 'Up to date');
-          return;
-        }
+    if (data.configured === false) {
+      box.innerHTML =
+        '<div class="hq-empty">Not connected to the events workbook yet.</div>';
+      status(light, false, 'Not connected');
+      return;
+    }
 
-        box.innerHTML = data.posts
-          .map(function (post) {
-            var face = post.avatar
-              ? '<img class="hq-post__face" src="' + esc(post.avatar) + '" alt="" width="34" height="34">'
-              : '<span class="hq-post__face"></span>';
-            var link = post.permalink
-              ? ' · <a href="' + esc(post.permalink) + '" target="_blank" rel="noopener">Open in Slack</a>'
-              : '';
-            return (
-              '<article class="hq-post">' + face + '<div>' +
-              '<div class="hq-post__meta"><span class="hq-post__who">' + esc(post.author) + '</span>' +
-              '<span class="hq-post__when">' + esc(when(post.at)) + link + '</span></div>' +
-              '<div class="hq-post__body">' + post.html + '</div>' +
-              '</div></article>'
-            );
-          })
-          .join('');
-        status(light, true, 'Live from #' + (data.channel || 'general'));
+    var items = data.announcements || [];
+    if (!items.length) {
+      box.innerHTML =
+        '<div class="hq-empty">Nothing new right now.' +
+        (data.error ? '<br><small>' + esc(data.error) + '</small>' : '') + '</div>';
+      status(light, !data.error, data.error ? 'Feed error' : 'Up to date');
+      return;
+    }
+
+    box.innerHTML = items
+      .map(function (item) {
+        var when = item.date ? new Date(item.date + 'T12:00:00') : null;
+        var stamp = when && !isNaN(when)
+          ? when.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+          : '';
+        var link = item.link
+          ? '<p style="margin-top:8px"><a href="' + esc(item.link) +
+            '" target="_blank" rel="noopener">' +
+            esc(item.link.replace(/^https?:\/\//, '').slice(0, 60)) + '</a></p>'
+          : '';
+        return (
+          '<article class="hq-post hq-post--note"><div>' +
+          '<div class="hq-post__meta"><span class="hq-post__who">' + esc(item.title) + '</span>' +
+          '<span class="hq-post__when">' + esc(stamp) + '</span></div>' +
+          '<div class="hq-post__body">' + esc(item.body).replace(/\n/g, '<br>') + link + '</div>' +
+          '</div></article>'
+        );
       })
-      .catch(function () {
-        box.innerHTML = '<div class="hq-empty">Could not reach Slack. Check <b>#general</b> directly.</div>';
-        status(light, false, 'Offline');
-      });
+      .join('');
+    status(light, true, 'From the events workbook');
   }
 
   /* ── Events ──────────────────────────────────────────────────────── */
@@ -227,6 +223,7 @@
       .then(function (r) { return r.json(); })
       .then(function (data) {
         goal(data.config || {});
+        announcements(data);
 
         if (data.configured === false) {
           box.innerHTML =
@@ -249,6 +246,7 @@
       .catch(function () {
         box.innerHTML = '<div class="hq-empty">Could not load events. Try a refresh.</div>';
         status(light, false, 'Offline');
+        status($('#hq-announcements-status'), false, 'Offline');
       });
   }
 
@@ -284,6 +282,7 @@
         credentials: 'same-origin',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          reporter: data.get('reporter'),
           location: data.get('location'),
           area: data.get('area'),
           detail: data.get('detail'),
@@ -292,8 +291,8 @@
       })
         .then(function (r) { return r.json().then(function (body) { return { ok: r.ok, body: body }; }); })
         .then(function (result) {
-          if (!result.ok) throw new Error(result.body.error || 'Slack refused the post.');
-          out.textContent = 'Posted to #' + (result.body.channel || 'studio-issues') + '. Thank you.';
+          if (!result.ok) throw new Error(result.body.error || 'Could not log it.');
+          out.textContent = 'Logged in the studio issues sheet. Thank you.';
           out.setAttribute('data-tone', 'ok');
           form.reset();
         })
@@ -309,6 +308,5 @@
   accordions();
   copying();
   issues();
-  announcements();
   events();
 })();

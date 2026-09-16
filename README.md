@@ -9,30 +9,27 @@ an internal tool is not riding along with marketing deploys. No framework, no
 dependencies, no build step on the host.
 
 ```bash
-node tools/dev.js --as "Your Name"   # → http://localhost:4333
+node tools/dev.js   # → http://localhost:4333
 ```
 
-`--as` skips Slack so the page can be worked on with no app configured. Without
-it you get the real sign-in screen.
+## There is no sign-in
 
-## Why it is a function, not a file
+The page is **public but unlisted**: no login, `noindex, nofollow, noarchive`
+on every response, `Disallow: /` in robots.txt, and in no sitemap. Anyone with
+the URL can read it, including former staff and anyone they forward it to, and
+it carries per-event pay rates, the trainer promo code and the bonus-scheme
+figures. Share the link with that in mind.
 
-Everything on the public site is a static file. This page is not: it carries
-per-event pay rates, the trainer promo code and the bonus scheme.
+It was built with Slack sign-in first. That was removed deliberately — standing
+up a Slack app was blocking launch — and the code is in git history
+(`git log --diff-filter=D -- api/auth`) if it is ever wanted back. A shared
+passcode is the cheaper middle option: one env var and a cookie, roughly an
+afternoon.
 
-`vercel.json` rewrites `/` to `api/hq/page.js`. That function requires
-`api/_page.js` — compiled from `src/` by `tools/build.py` — and returns the HTML
-only to a request holding a valid session; everyone else gets the sign-in
-screen. The compiled page lives inside `api/` with a leading underscore, which
-Vercel treats as a shared module rather than an endpoint, so no URL serves it
-unauthenticated. `.vercelignore` keeps `src/` and `tools/` out of the deployment
-entirely.
-
-Sign-in is **Sign in with Slack** (OpenID Connect). The callback refuses any
-identity whose `team_id` is not `SLACK_TEAM_ID`, so access follows Slack
-membership — someone removed from the workspace loses the page on their next
-visit, and there is no password to rotate. The session cookie is HMAC-signed,
-HttpOnly, Secure, SameSite=Lax, 30 days.
+It is still served by a function rather than as a static file. `vercel.json`
+rewrites `/` to `api/hq/page.js`, which returns `api/_page.js` — compiled from
+`src/` by `tools/build.py`. That keeps the page assembled from one source, and
+guarantees the noindex headers on every response rather than trusting a meta tag.
 
 ```bash
 python3 tools/build.py    # after editing src/, css/portal.css or js/portal.js
@@ -42,57 +39,46 @@ python3 tools/build.py    # after editing src/, css/portal.css or js/portal.js
 content hash into their `?v=` query strings, which is what gets a change past the
 year-long immutable cache on `/css` and `/js`.
 
-## The three live feeds
+## Where the content comes from
 
-| Panel | Source | Endpoint |
-| --- | --- | --- |
-| Announcements | Slack `#general` | `api/hq/slack.js` |
-| Events, and the membership count | the events workbook, via Apps Script | `api/hq/events.js` |
-| Report a studio issue | posts to Slack `#studio-issues` | `api/hq/issue.js` |
+Everything live on the page is one read of the events workbook, through the
+Apps Script web app. There is no Slack app, no bot token, and no second vendor.
 
-Credentials stay server-side; the browser only ever sees normalised JSON, and
-every endpoint returns 401 without a session. Text from Slack and from the sheet
-is escaped before it reaches the page, and only `http(s)` links become anchors —
-a ticket URL with a `javascript:` scheme is dropped.
+| Panel | Source |
+| --- | --- |
+| Announcements | the `ANNOUNCEMENTS` tab |
+| Events | the `WEBSITE FEED` tab, built from the `EVENT NN` tabs |
+| The 1,000 | the `SITE CONFIG` tab |
+| Report a studio issue | appends to the `STUDIO ISSUES` tab |
+
+The feed URL and its token stay on the server; the browser only ever sees
+normalised JSON and never a URL it could write to directly. Text from the sheet
+is escaped before it reaches the page, and only `http(s)` links become anchors.
 
 **Each panel says when it is not connected rather than showing anything
 invented.** A trainer reading a made-up call time is worse than one reading
 "not connected yet".
 
+### The issue form is a public write endpoint
+
+Because the page is public, so is `POST /api/hq/issue`. Three things bound it:
+every field is length-capped and the studio and area must match a known value;
+one browser gets four reports a minute; and the destination is a spreadsheet
+tab, so the worst case is rows somebody deletes — no mail sent, nothing charged.
+
+The rate limit is per warm instance and best-effort, which is the honest limit
+of counting in memory on serverless. If the form ever gets abused, the cheap
+fix is a passcode on the page rather than a cleverer limiter.
+
 ## Wiring it up
 
-Copy `.env.example` into Vercel's environment variables. Three jobs:
+Two variables, both from the Apps Script deployment — see the next section.
+Copy `.env.example` to `.env` for local work, and into Vercel's environment
+variables for the deployment.
 
-1. **Slack app** — api.slack.com/apps → create an app in the OCP workspace.
-   - *Sign in with Slack*: add the redirect URL
-     `https://<this-deployment>/api/auth/slack/callback`, and copy the client ID
-     and secret from Basic Information.
-   - *Bot token*: scopes `channels:history`, `channels:read`, `users:read`,
-     `chat:write`. Install, copy the `xoxb-` token, then invite the bot in Slack:
-     `/invite @<the app>` in **both** `#general` and `#studio-issues`. Without the
-     invite the API returns `not_in_channel`.
-   - `curl -H "Authorization: Bearer xoxb-…" https://slack.com/api/auth.test`
-     confirms the token and returns your `SLACK_TEAM_ID`.
-2. **Events feed** — `tools/apps-script/ocp-events-feed.gs`. See below.
-3. **Session secret** — `openssl rand -hex 32` into `HQ_SESSION_SECRET`.
-
-### Checking the Slack side
-
-```bash
-node tools/check-slack.js
 ```
-
-Reads `SLACK_BOT_TOKEN` from `.env` and reports what the bot can actually see:
-whether the token works, the `SLACK_TEAM_ID` to copy into Vercel, whether both
-channels exist, whether the bot has been invited to them, and whether it can
-read history. **It never prints the token**, so the output is safe to paste
-anywhere.
-
-Put the token in `.env` without it landing in your shell history:
-
-```bash
-cp -n .env.example .env
-read -rs TOKEN && printf 'SLACK_BOT_TOKEN=%s\n' "$TOKEN" >> .env && unset TOKEN
+EVENTS_FEED_URL=      # the /exec URL of the deployed web app
+EVENTS_FEED_TOKEN=    # the TOKEN you set at the top of the script
 ```
 
 ## The events workbook
@@ -101,6 +87,15 @@ read -rs TOKEN && printf 'SLACK_BOT_TOKEN=%s\n' "$TOKEN" >> .env && unset TOKEN
 `setup` once adds a `SITE CONFIG` tab (the membership count lives there), adds
 three rows to each event tab, builds a `WEBSITE FEED` tab, and schedules an
 hourly refresh. The sheet then gets a **Trainer HQ** menu.
+
+`setup` creates four tabs in all:
+
+| Tab | What it is for |
+| --- | --- |
+| `WEBSITE FEED` | one row per event, rebuilt from the `EVENT NN` tabs |
+| `ANNOUNCEMENTS` | Date, Title, Body, Link, Show On Site — type a row, it appears on the page |
+| `SITE CONFIG` | the membership count and goal |
+| `STUDIO ISSUES` | what the issue form writes, newest at the top |
 
 `WEBSITE FEED` is flat — one row per event — and it is what this site reads. It
 exists so the feed is something a person can look at.
@@ -128,7 +123,7 @@ reading the event tabs directly.
 node tools/apps-script/test/feed.test.js
 ```
 
-25 assertions. Apps Script cannot run locally, so `test/harness.js` stands in for
+38 assertions, covering the feed, the announcements tab, and issue logging. Apps Script cannot run locally, so `test/harness.js` stands in for
 `SpreadsheetApp` with plain 2-D arrays and the fixture is shaped like the real
 workbook. Run it after editing the `.gs`, then re-deploy (Manage deployments →
 edit → Version: New).
@@ -136,7 +131,7 @@ edit → Version: New).
 ## Layout
 
 ```
-api/            the functions — the gate, the Slack OAuth flow, the three feeds
+api/            three functions — serve the page, read the feed, log an issue
 api/_page.js    GENERATED by tools/build.py; do not edit
 src/            the page source: front matter, body, partials
 css/tokens.css  design-system tokens, copied from the main site

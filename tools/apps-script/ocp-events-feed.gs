@@ -43,6 +43,11 @@ var EVENT_TAB = /^EVENT\s*\d+$/i;
 
 var FEED_TAB = 'WEBSITE FEED';
 var CONFIG_TAB = 'SITE CONFIG';
+var NEWS_TAB = 'ANNOUNCEMENTS';
+var ISSUES_TAB = 'STUDIO ISSUES';
+
+var NEWS_COLUMNS = ['Date', 'Title', 'Body', 'Link', 'Show On Site'];
+var ISSUE_COLUMNS = ['Logged', 'Studio', 'Area', 'Detail', 'Urgent', 'Reported by', 'Status'];
 
 /** Column A label on an event tab → key in the feed. Matched case-insensitively
  *  by scanning column A, so inserting a row cannot break the mapping the way a
@@ -93,9 +98,16 @@ function onOpen() {
     .createMenu('Trainer HQ')
     .addItem('Refresh website feed', 'buildFeedTab')
     .addItem('Open the feed tab', 'showFeedTab')
+    .addItem('Open announcements', 'showNewsTab')
     .addSeparator()
     .addItem('Run first-time setup', 'setup')
     .addToUi();
+}
+
+function showNewsTab() {
+  var sheet = SpreadsheetApp.getActive().getSheetByName(NEWS_TAB);
+  if (sheet) SpreadsheetApp.getActive().setActiveSheet(sheet);
+  else SpreadsheetApp.getUi().alert('No ' + NEWS_TAB + ' tab yet — run Trainer HQ → Run first-time setup.');
 }
 
 function showFeedTab() {
@@ -272,6 +284,53 @@ function doGet(e) {
   }
 }
 
+/**
+ * Log a studio issue into the STUDIO ISSUES tab.
+ *
+ * The portal posts here instead of to Slack, so reporting an issue needs no
+ * Slack app. The tab is an ordinary sheet: sort it, filter it, mark things
+ * done, or hang a notification rule off it.
+ */
+function doPost(e) {
+  try {
+    var given = (e && e.parameter && e.parameter.token) || '';
+    if (!TOKEN || TOKEN.indexOf('PUT-A-LONG') === 0) {
+      return json_({ error: 'The feed token has not been set in the script yet.' });
+    }
+    if (given !== TOKEN) return json_({ error: 'Bad token.' });
+
+    var payload = JSON.parse((e && e.postData && e.postData.contents) || '{}');
+    var book = SpreadsheetApp.getActive();
+    var sheet = book.getSheetByName(ISSUES_TAB) || makeIssuesTab_(book);
+
+    sheet.insertRowAfter(1);
+    sheet.getRange(2, 1, 1, ISSUE_COLUMNS.length).setValues([[
+      Utilities.formatDate(new Date(), book.getSpreadsheetTimeZone(), 'yyyy-MM-dd HH:mm'),
+      String(payload.location || '').slice(0, 80),
+      String(payload.area || '').slice(0, 80),
+      String(payload.detail || '').slice(0, 1500),
+      payload.urgent ? 'URGENT' : '',
+      String(payload.reporter || '').slice(0, 80),
+      'New'
+    ]]);
+    return json_({ ok: true });
+  } catch (err) {
+    return json_({ error: String(err) });
+  }
+}
+
+function makeIssuesTab_(book) {
+  var sheet = book.insertSheet(ISSUES_TAB);
+  sheet.getRange(1, 1, 1, ISSUE_COLUMNS.length).setValues([ISSUE_COLUMNS]);
+  sheet.getRange(1, 1, 1, ISSUE_COLUMNS.length)
+    .setFontWeight('bold').setBackground('#0B0B0B').setFontColor('#F4EFE6');
+  sheet.setFrozenRows(1);
+  [140, 130, 150, 460, 80, 140, 90].forEach(function (width, index) {
+    sheet.setColumnWidth(index + 1, width);
+  });
+  return sheet;
+}
+
 function buildFeed_() {
   var book = SpreadsheetApp.getActive();
   var zone = book.getSpreadsheetTimeZone();
@@ -285,7 +344,8 @@ function buildFeed_() {
     generated: Utilities.formatDate(new Date(), zone, "yyyy-MM-dd'T'HH:mm:ssXXX"),
     source: sheet ? FEED_TAB : 'event tabs',
     config: readConfig_(book),
-    events: events.filter(function (event) { return event.show !== false; })
+    events: events.filter(function (event) { return event.show !== false; }),
+    announcements: readAnnouncements_(book, zone)
   };
 }
 
@@ -308,6 +368,33 @@ function readFeedTab_(sheet, zone) {
     });
     return event;
   }).filter(function (event) { return event.name && event.date; });
+}
+
+/** Announcements, newest first. Somebody types these; nothing generates them. */
+function readAnnouncements_(book, zone) {
+  var sheet = book.getSheetByName(NEWS_TAB);
+  if (!sheet || sheet.getLastRow() < 2) return [];
+
+  var grid = sheet.getRange(1, 1, sheet.getLastRow(), NEWS_COLUMNS.length).getValues();
+  var headers = grid[0].map(function (value) { return String(value || '').trim(); });
+  var at = {};
+  NEWS_COLUMNS.forEach(function (name) { at[name] = headers.indexOf(name); });
+
+  return grid
+    .slice(1)
+    .map(function (row) {
+      var pick = function (name) { return at[name] > -1 ? row[at[name]] : ''; };
+      return {
+        date: asDate_(pick('Date'), zone),
+        title: String(pick('Title') || '').trim(),
+        body: String(pick('Body') || '').trim(),
+        link: String(pick('Link') || '').trim(),
+        show: truthy_(pick('Show On Site'))
+      };
+    })
+    .filter(function (item) { return item.show && (item.title || item.body); })
+    .sort(function (a, b) { return String(b.date).localeCompare(String(a.date)); })
+    .slice(0, 12);
 }
 
 /* ══ READING AN EVENT TAB ═══════════════════════════════════════════════ */
@@ -423,12 +510,30 @@ function setup() {
     if (EVENT_TAB.test(sheet.getName().trim())) addRows_(sheet);
   });
 
+  if (!book.getSheetByName(NEWS_TAB)) {
+    var news = book.insertSheet(NEWS_TAB);
+    news.getRange(1, 1, 2, NEWS_COLUMNS.length).setValues([
+      NEWS_COLUMNS,
+      [Utilities.formatDate(new Date(), book.getSpreadsheetTimeZone(), 'yyyy-MM-dd'),
+       'Trainer HQ is live', 'Everything you need before you step on the floor is now in one place.', '', 'Yes']
+    ]);
+    news.getRange(1, 1, 1, NEWS_COLUMNS.length)
+      .setFontWeight('bold').setBackground('#0B0B0B').setFontColor('#F4EFE6');
+    news.setFrozenRows(1);
+    [110, 260, 560, 240, 110].forEach(function (width, index) {
+      news.setColumnWidth(index + 1, width);
+    });
+    news.getRange(2, 3, 200, 1).setWrap(true);
+  }
+  if (!book.getSheetByName(ISSUES_TAB)) makeIssuesTab_(book);
+
   var count = buildFeedTab();
   installTrigger();
 
   SpreadsheetApp.getUi().alert(
     'Trainer HQ is set up.\n\n' +
       '· ' + CONFIG_TAB + ' tab added (the membership count lives there)\n' +
+      '· ' + NEWS_TAB + ' and ' + ISSUES_TAB + ' tabs added\n' +
       '· Ticket Link, Call Time and Show On Site rows added to the event tabs\n' +
       '· ' + FEED_TAB + ' built with ' + count + ' event(s)\n' +
       '· Hourly refresh scheduled\n\n' +

@@ -56,6 +56,12 @@ const book=new Book([
     format:'Mat Class',type:'Partner Event',capacity:120,price:50,
     description:'Rooftop mat class, breath work, then the plunge.',
     instructors:[['Amanda Lauro','Lead Instructor',200,'']]}),
+  new Sheet('ANNOUNCEMENTS',[
+    ['Date','Title','Body','Link','Show On Site'],
+    ['2026-09-10','Roundtable team dinner','Whole team, Lower Greenville, 5pm.','https://example.com/rsvp','Yes'],
+    ['2026-09-14','Staff photoshoot','Bring your glamour fits.','','Yes'],
+    ['2026-09-01','Draft — do not show','Not ready.','','No'],
+  ]),
   new Sheet('SITE CONFIG',[
     ['# config',''],['active_members',922],['member_goal',1000],
     ['goal_label','By December 31'],['updated','Sep 14, 2026']]),
@@ -130,6 +136,35 @@ check('ticket url round-trips',e.ticketUrl,'https://app.arketa.co/oakcliffpilate
 check('instructors parsed back',e.instructors,[
   {name:'Tina Darling',role:'Lead Instructor',pay:'$100',scope:'Lead the class, stay after.'},
   {name:'Pepe Mendoza',role:'Support',pay:'$50',scope:''}]);
+
+console.log('\n── announcements ──');
+const news=out.announcements;
+check('hidden row filtered out',news.length,2);
+check('newest first',news.map(n=>n.title),['Staff photoshoot','Roundtable team dinner']);
+check('body carried',news[1].body,'Whole team, Lower Greenville, 5pm.');
+check('link carried',news[1].link,'https://example.com/rsvp');
+
+console.log('\n── logging a studio issue ──');
+const before=book.getSheetByName('STUDIO ISSUES');
+check('no issues tab until something is logged',before,null);
+const res=JSON.parse(ctx.doPost({parameter:{token:'test-token'},
+  postData:{contents:JSON.stringify({location:'Uptown',area:'Equipment',
+    detail:'Reformer 4 footbar will not lock.',urgent:true,reporter:'Tina'})}}));
+check('accepted',res.ok,true);
+const issues=book.getSheetByName('STUDIO ISSUES');
+const row=issues.getRange(2,1,1,7).getValues()[0];
+check('header row intact',issues.getRange(1,1,1,7).getValues()[0].slice(1,4),['Studio','Area','Detail']);
+check('logged in row 2',[row[1],row[2],row[4],row[5],row[6]],
+  ['Uptown','Equipment','URGENT','Tina','New']);
+check('timestamp is a readable date, not an ISO string',
+  /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}$/.test(row[0]),true);
+const res2=JSON.parse(ctx.doPost({parameter:{token:'wrong'},postData:{contents:'{}'}}));
+check('bad token refused',res2.error,'Bad token.');
+const res3=JSON.parse(ctx.doPost({parameter:{token:'test-token'},
+  postData:{contents:JSON.stringify({location:'Bishop Arts',area:'Bathrooms',detail:'Out of paper towels.',reporter:'Amanda'})}}));
+check('second issue accepted',res3.ok,true);
+check('newest issue on top',issues.getRange(2,2,1,1).getValue(),'Bishop Arts');
+check('first issue pushed down',issues.getRange(3,2,1,1).getValue(),'Uptown');
 
 console.log('\n── no feed tab yet: falls back to the event tabs ──');
 const book2=new Book(book.getSheets().filter(s=>s.getName()!=='WEBSITE FEED'));

@@ -139,6 +139,9 @@
 .hq-live--bad .hq-live__dot{background:var(--ocp-grey-600)}
 
 .hq-post{display:grid;grid-template-columns:34px minmax(0,1fr);gap:0 14px;padding:16px 0;border-top:var(--rule-subtle)}
+/* Announcements are typed by a person, not posted by one — no avatar to show,
+   so the column goes rather than sitting there as an empty circle. */
+.hq-post--note{grid-template-columns:minmax(0,1fr)}
 .hq-post:first-child{border-top:0;padding-top:0}
 .hq-post__face{
   width:34px;height:34px;border-radius:50%;object-fit:cover;
