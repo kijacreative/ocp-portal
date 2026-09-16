@@ -76,6 +76,25 @@ Copy `.env.example` into Vercel's environment variables. Three jobs:
 2. **Events feed** — `tools/apps-script/ocp-events-feed.gs`. See below.
 3. **Session secret** — `openssl rand -hex 32` into `HQ_SESSION_SECRET`.
 
+### Checking the Slack side
+
+```bash
+node tools/check-slack.js
+```
+
+Reads `SLACK_BOT_TOKEN` from `.env` and reports what the bot can actually see:
+whether the token works, the `SLACK_TEAM_ID` to copy into Vercel, whether both
+channels exist, whether the bot has been invited to them, and whether it can
+read history. **It never prints the token**, so the output is safe to paste
+anywhere.
+
+Put the token in `.env` without it landing in your shell history:
+
+```bash
+cp -n .env.example .env
+read -rs TOKEN && printf 'SLACK_BOT_TOKEN=%s\n' "$TOKEN" >> .env && unset TOKEN
+```
+
 ## The events workbook
 
 `tools/apps-script/ocp-events-feed.gs` is bound to the event workbook. Running
