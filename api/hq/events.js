@@ -1,11 +1,20 @@
 'use strict';
-/* Events and announcements, read from the Apps Script feed bound to the
- * events workbook.
+/* Events, announcements and the membership count.
  *
- * The feed URL and its token stay on the server; the browser only ever sees
- * the normalised list, and never a URL it could post to directly. If the feed is not wired up yet the endpoint says so
- * plainly rather than inventing events — a trainer reading a stale or made-up
- * call time is worse than a trainer reading "not connected". */
+ * Two sources, because no single one has everything:
+ *
+ *   EVENTS_FEED_URL     events. Either the events service at
+ *                       events.oakcliffpilates.com/api/feed, or the Apps
+ *                       Script web app bound to the events workbook.
+ *   WORKBOOK_FEED_URL   the Apps Script: announcements, the membership count,
+ *                       and where the issue form logs. Optional.
+ *
+ * When only one is set it supplies whatever it has. Each panel is answered
+ * independently, so a missing workbook costs you announcements and the
+ * counter but leaves events working, and vice versa.
+ *
+ * Both URLs and their tokens stay on the server; the browser only ever sees
+ * the normalised result. */
 const { json } = require('../_lib/http');
 
 const TTL = 2 * 60 * 1000;
@@ -16,82 +25,131 @@ function startOfToday() {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 }
 
-function normalise(raw) {
-  const events = (raw.events || [])
-    .filter(function (event) {
-      return event && event.name && event.date;
-    })
-    .map(function (event) {
-      const when = new Date(`${event.date}T12:00:00`);
-      return {
-        id: String(event.id || event.name),
-        name: String(event.name),
-        date: event.date,
-        day: String(when.getDate()).padStart(2, '0'),
-        month: when.toLocaleString('en-US', { month: 'short' }),
-        weekday: when.toLocaleString('en-US', { weekday: 'short' }),
-        time: [event.start, event.end].filter(Boolean).join(' – '),
-        dateStatus: event.dateStatus || '',
-        location: event.location || '',
-        format: event.format || '',
-        type: event.type || '',
-        price: event.price || '',
-        discounts: event.discounts || '',
-        description: event.description || '',
-        capacity: event.capacity || '',
-        callTime: event.callTime || '',
-        ticketUrl: /^https?:\/\//.test(event.ticketUrl || '') ? event.ticketUrl : '',
-        instructors: (event.instructors || [])
-          .filter((person) => person && person.name)
-          .map(function (person) {
-            return {
-              name: String(person.name),
-              role: person.role || '',
-              pay: person.pay || '',
-              scope: person.scope || '',
-            };
-          }),
-        ms: when.getTime(),
-      };
-    });
+async function fetchFeed(url, token) {
+  const target = new URL(url);
+  if (token) target.searchParams.set('token', token);
+  const response = await fetch(target.toString(), { redirect: 'follow' });
+  if (!response.ok) throw new Error(`feed returned ${response.status}`);
+  const body = await response.json();
+  if (body.error) throw new Error(body.error);
+  return body;
+}
 
-  const floor = startOfToday();
-  const upcoming = events.filter((event) => event.ms >= floor).sort((a, b) => a.ms - b.ms);
-  const past = events.filter((event) => event.ms < floor).sort((a, b) => b.ms - a.ms).slice(0, 6);
+function freeOrPrice(value) {
+  if (value == null || value === '') return '';
+  const text = String(value).trim();
+  return /^\$?0(\.0{1,2})?$/.test(text) ? 'Free' : text;
+}
+
+function normaliseEvent(event) {
+  const when = new Date(`${event.date}T12:00:00`);
+  // The events service calls it `url`; the Apps Script calls it `ticketUrl`.
+  const ticket = event.ticketUrl || event.url || '';
   return {
-    upcoming,
-    past,
-    announcements: raw.announcements || [],
-    config: raw.config || {},
-    generated: raw.generated || null,
+    id: String(event.id || event.name),
+    name: String(event.name),
+    date: event.date,
+    day: String(when.getDate()).padStart(2, '0'),
+    month: when.toLocaleString('en-US', { month: 'short' }),
+    weekday: when.toLocaleString('en-US', { weekday: 'short' }),
+    time: [event.start, event.end].filter(Boolean).join(' – '),
+    dateStatus: event.dateStatus || '',
+    location: event.location || '',
+    format: event.format || '',
+    type: event.type || '',
+    // "$0" on a card reads as a bug rather than as free admission.
+    price: freeOrPrice(event.price),
+    discounts: event.discounts || '',
+    description: event.description || '',
+    capacity: event.capacity == null ? '' : String(event.capacity),
+    callTime: event.callTime || '',
+    ticketUrl: /^https?:\/\//.test(ticket) ? ticket : '',
+    instructors: (event.instructors || [])
+      .filter((person) => person && person.name)
+      .map(function (person) {
+        return {
+          name: String(person.name),
+          role: person.role || '',
+          pay: person.pay || '',
+          scope: person.scope || '',
+        };
+      }),
+    ms: when.getTime(),
+  };
+}
+
+function normaliseAnnouncement(item) {
+  return {
+    date: item.date || '',
+    title: String(item.title || ''),
+    body: String(item.body || ''),
+    link: /^https?:\/\//.test(item.link || '') ? item.link : '',
   };
 }
 
 module.exports = async function handler(req, res) {
-  const feed = process.env.EVENTS_FEED_URL;
-  if (!feed) {
-    return json(res, 200, { configured: false, upcoming: [], past: [], announcements: [], config: {} });
+  const eventsUrl = process.env.EVENTS_FEED_URL;
+  const workbookUrl = process.env.WORKBOOK_FEED_URL;
+
+  if (!eventsUrl && !workbookUrl) {
+    return json(res, 200, {
+      configured: false,
+      upcoming: [],
+      past: [],
+      announcements: [],
+      config: {},
+    });
   }
 
   if (cache && Date.now() - cache.at < TTL) {
     return json(res, 200, cache.body, 'public, max-age=60, s-maxage=120');
   }
 
-  try {
-    const url = new URL(feed);
-    if (process.env.EVENTS_FEED_TOKEN) url.searchParams.set('token', process.env.EVENTS_FEED_TOKEN);
-    const response = await fetch(url.toString(), { redirect: 'follow' });
-    if (!response.ok) throw new Error(`feed returned ${response.status}`);
-    const raw = await response.json();
-    if (raw.error) throw new Error(raw.error);
+  const errors = [];
+  const [eventsRaw, workbookRaw] = await Promise.all(
+    [
+      [eventsUrl, process.env.EVENTS_FEED_TOKEN, 'events'],
+      [workbookUrl, process.env.WORKBOOK_FEED_TOKEN, 'workbook'],
+    ].map(async function ([url, token, label]) {
+      if (!url) return null;
+      try {
+        return await fetchFeed(url, token);
+      } catch (err) {
+        errors.push(`${label}: ${err.message}`);
+        return null;
+      }
+    })
+  );
 
-    const body = Object.assign({ configured: true }, normalise(raw));
-    cache = { at: Date.now(), body };
-    return json(res, 200, body, 'public, max-age=60, s-maxage=120');
-  } catch (err) {
-    if (cache) {
-      return json(res, 200, Object.assign({ stale: true, error: err.message }, cache.body));
-    }
-    return json(res, 200, { configured: true, upcoming: [], past: [], announcements: [], config: {}, error: err.message });
+  // Events come from the events feed when there is one, otherwise from the
+  // workbook — which serves them too when it is the only source configured.
+  const eventSource = eventsRaw || workbookRaw;
+  const eventSourceName = eventsRaw ? 'the events calendar' : workbookRaw ? 'the events workbook' : '';
+  // Announcements and the counter only ever come from the workbook, except
+  // when the workbook IS the events feed.
+  const extras = workbookRaw || (workbookUrl ? null : eventsRaw);
+
+  const all = ((eventSource && eventSource.events) || [])
+    .filter((event) => event && event.name && event.date)
+    .map(normaliseEvent);
+
+  const floor = startOfToday();
+  const body = {
+    configured: true,
+    upcoming: all.filter((e) => e.ms >= floor).sort((a, b) => a.ms - b.ms),
+    past: all.filter((e) => e.ms < floor).sort((a, b) => b.ms - a.ms).slice(0, 6),
+    announcements: ((extras && extras.announcements) || []).map(normaliseAnnouncement),
+    config: (extras && extras.config) || {},
+    generated: (eventSource && eventSource.generated) || null,
+    eventSource: eventSourceName,
+    announcementsConfigured: Boolean(workbookUrl || (extras && extras.announcements)),
+  };
+  if (errors.length) body.error = errors.join('; ');
+
+  // Only cache a result that actually carries something.
+  if (!errors.length || body.upcoming.length) cache = { at: Date.now(), body };
+  if (errors.length && cache && !body.upcoming.length) {
+    return json(res, 200, Object.assign({ stale: true }, cache.body, { error: body.error }));
   }
+  return json(res, 200, body, 'public, max-age=60, s-maxage=120');
 };

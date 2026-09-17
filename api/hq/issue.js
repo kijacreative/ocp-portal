@@ -1,5 +1,7 @@
 'use strict';
-/* Log a studio issue into the events workbook.
+/* Log a studio issue into the events workbook, through the Apps Script web app
+ * named by WORKBOOK_FEED_URL. The events service does not accept writes, so
+ * this is the workbook or nothing.
  *
  * This endpoint is public, because the page is. Two consequences are handled
  * here rather than hoped away: every field is bounded, and one browser can
@@ -29,7 +31,7 @@ function tooMany(req) {
 module.exports = async function handler(req, res) {
   if (req.method !== 'POST') return json(res, 405, { error: 'Use POST.' });
 
-  const feed = process.env.EVENTS_FEED_URL;
+  const feed = process.env.WORKBOOK_FEED_URL;
   if (!feed) {
     return json(res, 503, { error: 'Not connected to the workbook yet — tell Charley directly for now.' });
   }
@@ -50,7 +52,7 @@ module.exports = async function handler(req, res) {
 
   try {
     const url = new URL(feed);
-    if (process.env.EVENTS_FEED_TOKEN) url.searchParams.set('token', process.env.EVENTS_FEED_TOKEN);
+    if (process.env.WORKBOOK_FEED_TOKEN) url.searchParams.set('token', process.env.WORKBOOK_FEED_TOKEN);
     const response = await fetch(url.toString(), {
       method: 'POST',
       redirect: 'follow',

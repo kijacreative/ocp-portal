@@ -80,9 +80,10 @@
     if (!box) return;
     var light = $('#hq-announcements-status');
 
-    if (data.configured === false) {
+    if (data.configured === false || data.announcementsConfigured === false) {
       box.innerHTML =
-        '<div class="hq-empty">Not connected to the events workbook yet.</div>';
+        '<div class="hq-empty">Announcements are not connected yet. They come from the ' +
+        '<b>ANNOUNCEMENTS</b> tab in the events workbook.</div>';
       status(light, false, 'Not connected');
       return;
     }
@@ -192,7 +193,21 @@
     if (!box) return;
     var now = Number(config.active_members);
     var target = Number(config.member_goal) || 1000;
-    if (!now || !isFinite(now)) return;
+
+    if (!now || !isFinite(now)) {
+      // Better to say the count is missing than to show a dash and an empty
+      // bar, which reads like the studio has no members.
+      box.outerHTML =
+        '<div class="hq-empty" id="hq-goal-nums">The member count is not connected yet. ' +
+        'It comes from the <b>SITE CONFIG</b> tab in the events workbook.</div>';
+      var railBox = $('.hq-rail');
+      if (railBox) railBox.hidden = true;
+      var stamp0 = $('#hq-goal-updated');
+      if (stamp0) stamp0.hidden = true;
+      return;
+    }
+    var shownRail = $('.hq-rail');
+    if (shownRail) shownRail.hidden = false;
 
     var left = Math.max(target - now, 0);
     var pct = Math.min((now / target) * 100, 100);
@@ -241,7 +256,9 @@
         }
 
         box.innerHTML = data.upcoming.map(eventCard).join('');
-        status(light, true, data.stale ? 'Showing the last good copy' : 'Live from the events sheet');
+        status(light, true, data.stale
+          ? 'Showing the last good copy'
+          : 'Live from ' + (data.eventSource || 'the feed'));
       })
       .catch(function () {
         box.innerHTML = '<div class="hq-empty">Could not load events. Try a refresh.</div>';

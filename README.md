@@ -41,23 +41,38 @@ year-long immutable cache on `/css` and `/js`.
 
 ## Where the content comes from
 
-Everything live on the page is one read of the events workbook, through the
-Apps Script web app. There is no Slack app, no bot token, and no second vendor.
+Two sources, because neither has everything. Each panel is answered
+independently, so one being absent never takes the other down.
 
-| Panel | Source |
-| --- | --- |
-| Announcements | the `ANNOUNCEMENTS` tab |
-| Events | the `WEBSITE FEED` tab, built from the `EVENT NN` tabs |
-| The 1,000 | the `SITE CONFIG` tab |
-| Report a studio issue | appends to the `STUDIO ISSUES` tab |
+| Panel | Source | Variable |
+| --- | --- | --- |
+| Events | the events service, `events.oakcliffpilates.com/api/feed` | `EVENTS_FEED_URL` |
+| Announcements | the `ANNOUNCEMENTS` tab | `WORKBOOK_FEED_URL` |
+| The 1,000 | the `SITE CONFIG` tab | `WORKBOOK_FEED_URL` |
+| Report a studio issue | appends to the `STUDIO ISSUES` tab | `WORKBOOK_FEED_URL` |
 
-The feed URL and its token stay on the server; the browser only ever sees
-normalised JSON and never a URL it could write to directly. Text from the sheet
-is escaped before it reaches the page, and only `http(s)` links become anchors.
+`WORKBOOK_FEED_URL` is the Apps Script web app and is optional. Without it,
+events still work and the other three panels say plainly that they are not
+connected. Set only `WORKBOOK_FEED_URL` and it serves everything including
+events, which is how this started.
+
+**The events service carries no instructors, pay or call time.** Those three
+fields are simply absent from the cards when events come from it — the card
+drops any field with no value rather than showing an empty label. If trainers
+need to see what an event pays, either add those fields to the events service
+or serve events from the workbook instead, where the `EVENT NN` tabs have them.
+
+Both URLs and their tokens stay on the server; the browser only ever sees the
+normalised result and never a URL it could write to. Text from either source is
+escaped before it reaches the page, and only `http(s)` links become anchors.
 
 **Each panel says when it is not connected rather than showing anything
 invented.** A trainer reading a made-up call time is worse than one reading
 "not connected yet".
+
+Responses are cached 60 seconds in the browser and 120 at the edge. Worth
+knowing while developing: a change to the endpoint will not show for a minute
+unless you hard-reload.
 
 ### The issue form is a public write endpoint
 
@@ -72,14 +87,18 @@ fix is a passcode on the page rather than a cleverer limiter.
 
 ## Wiring it up
 
-Two variables, both from the Apps Script deployment — see the next section.
 Copy `.env.example` to `.env` for local work, and into Vercel's environment
 variables for the deployment.
 
 ```
-EVENTS_FEED_URL=      # the /exec URL of the deployed web app
-EVENTS_FEED_TOKEN=    # the TOKEN you set at the top of the script
+EVENTS_FEED_URL=https://events.oakcliffpilates.com/api/feed
+EVENTS_FEED_TOKEN=        # not needed for the events service
+WORKBOOK_FEED_URL=        # the /exec URL of the deployed Apps Script
+WORKBOOK_FEED_TOKEN=      # the TOKEN you set at the top of that script
 ```
+
+The events URL is already filled in. The workbook pair comes from deploying
+the Apps Script — see the next section.
 
 ## The events workbook
 
