@@ -74,6 +74,39 @@ Responses are cached 60 seconds in the browser and 120 at the edge. Worth
 knowing while developing: a change to the endpoint will not show for a minute
 unless you hard-reload.
 
+### The membership count
+
+Arketa holds the real figure, in its **Active subscriptions** report. Nothing
+here can reach it: the Arketa MCP is a tool inside a Claude session, not an API
+this server has a key for. So the number is carried, not fetched — from the
+workbook's `SITE CONFIG` tab when that is wired, otherwise from `MEMBER_COUNT`.
+Either way it is a figure somebody updates, and the panel dates it ("Counted
+17 Sep 2026") rather than implying it is live.
+
+Counted 17 September 2026, the report breaks down as:
+
+| Definition | Subscriptions |
+| --- | --- |
+| substatus `active` | 677 |
+| + `canceling` — still entitled, leaving at term end | **707** |
+| + `trialing` and `past_due` | 733 |
+| + `paused` | 833 |
+| everything Arketa files under active | 886 |
+
+707 is the default: people who can book a class today and are not paused.
+Whether paused members count toward the 1,000 is a business call, not a
+technical one.
+
+**These are subscriptions, not people.** A Couples Unlimited is one
+subscription covering two members, and one person can hold more than one, so
+the figure is not a clean headcount in either direction. If the 1,000 is meant
+to mean a thousand humans, that difference is worth pinning down before the
+number goes on a wall.
+
+To refresh it, re-run the report and update the one value. It can also be
+scheduled — a recurring Claude task can run the report and write the new number
+to `SITE CONFIG` without anyone opening Arketa.
+
 ### The issue form is a public write endpoint
 
 Because the page is public, so is `POST /api/hq/issue`. Three things bound it:

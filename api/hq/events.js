@@ -78,6 +78,29 @@ function normaliseEvent(event) {
   };
 }
 
+/* The membership count.
+ *
+ * Arketa is where the real number lives, but nothing here can reach it: the
+ * Arketa MCP is a tool in a Claude session, not an API this server holds a key
+ * for. So the number is carried rather than fetched — from the workbook's
+ * SITE CONFIG tab when that is wired up, otherwise from MEMBER_COUNT here.
+ *
+ * Either way it is a figure somebody updates, so the page says when it was
+ * last counted rather than implying it is live. */
+function withMemberCount(config) {
+  const merged = Object.assign({}, config);
+  if (merged.active_members == null && process.env.MEMBER_COUNT) {
+    merged.active_members = Number(process.env.MEMBER_COUNT);
+  }
+  if (merged.member_goal == null && process.env.MEMBER_GOAL) {
+    merged.member_goal = Number(process.env.MEMBER_GOAL);
+  }
+  if (merged.updated == null && process.env.MEMBER_COUNT_UPDATED) {
+    merged.updated = process.env.MEMBER_COUNT_UPDATED;
+  }
+  return merged;
+}
+
 function normaliseAnnouncement(item) {
   return {
     date: item.date || '',
@@ -139,7 +162,7 @@ module.exports = async function handler(req, res) {
     upcoming: all.filter((e) => e.ms >= floor).sort((a, b) => a.ms - b.ms),
     past: all.filter((e) => e.ms < floor).sort((a, b) => b.ms - a.ms).slice(0, 6),
     announcements: ((extras && extras.announcements) || []).map(normaliseAnnouncement),
-    config: (extras && extras.config) || {},
+    config: withMemberCount((extras && extras.config) || {}),
     generated: (eventSource && eventSource.generated) || null,
     eventSource: eventSourceName,
     announcementsConfigured: Boolean(workbookUrl || (extras && extras.announcements)),
