@@ -16,8 +16,8 @@ const PAGE = `<!DOCTYPE html>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Khand:wght@400;500;600;700&family=Montserrat:wght@300;400;600;700;900&display=swap">
 <link rel="stylesheet" href="/css/tokens.css">
-<link rel="stylesheet" href="/css/base.css?v=ede8fa7111">
-<link rel="stylesheet" href="/css/portal.css?v=ede8fa7111">
+<link rel="stylesheet" href="/css/base.css?v=c11548439f">
+<link rel="stylesheet" href="/css/portal.css?v=c11548439f">
 </head>
 
 <body class="hq">
@@ -810,7 +810,7 @@ const PAGE = `<!DOCTYPE html>
   </main>
 </div>
 
-<script src="/js/portal.js?v=ede8fa7111" defer></script>
+<script src="/js/portal.js?v=c11548439f" defer></script>
 </body>
 </html>
 `;
@@ -819,4 +819,4 @@ function render() {
   return PAGE;
 }
 
-module.exports = { render, version: "ede8fa7111" };
+module.exports = { render, version: "c11548439f" };

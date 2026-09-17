@@ -121,12 +121,15 @@ module.exports = async function handler(req, res) {
   const workbookUrl = process.env.WORKBOOK_FEED_URL;
 
   if (!eventsUrl && !workbookUrl) {
+    // Still hand back the membership count: it is committed in the repo, not
+    // fetched from either feed, so it has no business disappearing because a
+    // feed URL is unset.
     return json(res, 200, {
       configured: false,
       upcoming: [],
       past: [],
       announcements: [],
-      config: {},
+      config: withMemberCount({}),
     });
   }
 

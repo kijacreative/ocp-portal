@@ -243,7 +243,8 @@
         if (data.configured === false) {
           box.innerHTML =
             '<div class="hq-empty">The events feed is not connected yet. ' +
-            'Until it is, the calendar lives in the events workbook.</div>';
+            'The calendar itself is at <a href="https://events.oakcliffpilates.com" ' +
+            'target="_blank" rel="noopener">events.oakcliffpilates.com</a>.</div>';
           status(light, false, 'Not connected');
           return;
         }
