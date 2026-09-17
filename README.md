@@ -103,9 +103,27 @@ the figure is not a clean headcount in either direction. If the 1,000 is meant
 to mean a thousand humans, that difference is worth pinning down before the
 number goes on a wall.
 
-To refresh it, re-run the report and update the one value. It can also be
-scheduled — a recurring Claude task can run the report and write the new number
-to `SITE CONFIG` without anyone opening Arketa.
+### Refreshing it
+
+A scheduled task, **Trainer HQ — weekly membership count**, runs every Monday
+morning: it reads the Arketa report, runs `tools/set-member-count.js`, and if
+the number moved, commits `api/_members.js` and pushes — which triggers the
+deploy that puts it on the page. Manage it in the app's Scheduled sidebar.
+
+It runs on the studio Mac, not in the cloud, because that is where Arketa is
+connected. If the app is shut when Monday comes round, it runs at next launch.
+A cloud routine would need GitHub connected to the Claude account and the Arketa
+connector attached; neither is set up today.
+
+By hand, any time:
+
+```bash
+node tools/set-member-count.js 712
+```
+
+It refuses a number that is not plausible, and refuses any change greater than
+33% in one run without `--force` — a swing that size is far more likely to be a
+bad query than a real week at the studio. `--show` prints the current value.
 
 ### The issue form is a public write endpoint
 
