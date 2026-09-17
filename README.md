@@ -138,18 +138,21 @@ fix is a passcode on the page rather than a cleverer limiter.
 
 ## Wiring it up
 
-Copy `.env.example` to `.env` for local work, and into Vercel's environment
-variables for the deployment.
+**Nothing has to be configured for the page to work.** Events come from the
+public events service by default, and the membership count is committed in
+`api/_members.js`. Deploy the repo and those two panels are live.
+
+Two optional pairs, for when you want them:
 
 ```
-EVENTS_FEED_URL=https://events.oakcliffpilates.com/api/feed
-EVENTS_FEED_TOKEN=        # not needed for the events service
-WORKBOOK_FEED_URL=        # the /exec URL of the deployed Apps Script
-WORKBOOK_FEED_TOKEN=      # the TOKEN you set at the top of that script
+EVENTS_FEED_URL=      # only to point events somewhere other than the default
+EVENTS_FEED_TOKEN=
+WORKBOOK_FEED_URL=    # the /exec URL of the deployed Apps Script
+WORKBOOK_FEED_TOKEN=  # the TOKEN you set at the top of that script
 ```
 
-The events URL is already filled in. The workbook pair comes from deploying
-the Apps Script — see the next section.
+The workbook pair turns on announcements and the issue form — see the next
+section. Until it is set, those two panels say so.
 
 ## The events workbook
 

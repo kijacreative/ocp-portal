@@ -3,9 +3,9 @@
  *
  * Two sources, because no single one has everything:
  *
- *   EVENTS_FEED_URL     events. Either the events service at
- *                       events.oakcliffpilates.com/api/feed, or the Apps
- *                       Script web app bound to the events workbook.
+ *   EVENTS_FEED_URL     events. Defaults to the public events service, so
+ *                       nothing needs configuring for events to work. Set it
+ *                       only to point somewhere else.
  *   WORKBOOK_FEED_URL   the Apps Script: announcements, the membership count,
  *                       and where the issue form logs. Optional.
  *
@@ -16,6 +16,12 @@
  * Both URLs and their tokens stay on the server; the browser only ever sees
  * the normalised result. */
 const { json } = require('../_lib/http');
+
+/* The events service is public and needs no token, so it is the default rather
+ * than something that has to be configured before the page works. Set
+ * EVENTS_FEED_URL to point somewhere else — a staging feed, or the Apps Script
+ * web app if events ever move back to the workbook. */
+const DEFAULT_EVENTS_FEED = 'https://events.oakcliffpilates.com/api/feed';
 
 const TTL = 2 * 60 * 1000;
 let cache = null;
@@ -117,7 +123,7 @@ function normaliseAnnouncement(item) {
 }
 
 module.exports = async function handler(req, res) {
-  const eventsUrl = process.env.EVENTS_FEED_URL;
+  const eventsUrl = process.env.EVENTS_FEED_URL || DEFAULT_EVENTS_FEED;
   const workbookUrl = process.env.WORKBOOK_FEED_URL;
 
   if (!eventsUrl && !workbookUrl) {
