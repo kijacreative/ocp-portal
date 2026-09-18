@@ -6,8 +6,12 @@
  *   EVENTS_FEED_URL     events. Defaults to the public events service, so
  *                       nothing needs configuring for events to work. Set it
  *                       only to point somewhere else.
- *   WORKBOOK_FEED_URL   the Apps Script: announcements, the membership count,
- *                       and where the issue form logs. Optional.
+ *   ANNOUNCEMENTS_CSV_URL  a Google Sheet published to the web as CSV. No
+ *                          credential of any kind — which is the point: it is
+ *                          the shortest path from "someone typed it" (or a Zap
+ *                          copied it out of Slack) to the page.
+ *   WORKBOOK_FEED_URL      the Apps Script, if it is ever deployed. Serves the
+ *                          same things plus events. Optional.
  *
  * When only one is set it supplies whatever it has. Each panel is answered
  * independently, so a missing workbook costs you announcements and the
@@ -16,6 +20,7 @@
  * Both URLs and their tokens stay on the server; the browser only ever sees
  * the normalised result. */
 const { json } = require('../_lib/http');
+const csv = require('../_lib/csv');
 
 /* The events service is public and needs no token, so it is the default rather
  * than something that has to be configured before the page works. Set
@@ -29,6 +34,32 @@ let cache = null;
 function startOfToday() {
   const now = new Date();
   return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
+}
+
+/* Announcements from a published sheet. Columns, by header name:
+ * Date, Title, Body, Link, Show On Site. Anything else is ignored, and a row
+ * saying no under Show On Site is skipped. */
+async function fetchAnnouncementsCsv(url) {
+  const response = await fetch(url, { redirect: 'follow' });
+  if (!response.ok) throw new Error(`sheet returned ${response.status}`);
+  const text = await response.text();
+  if (/^\s*</.test(text)) {
+    // A sheet that is not actually published serves an HTML sign-in page with
+    // a 200, which would otherwise parse as one nonsense row.
+    throw new Error('that URL returned a web page, not CSV — is the sheet published?');
+  }
+  return csv
+    .toObjects(text)
+    .filter(function (row) {
+      const show = (row['show on site'] || '').toLowerCase();
+      const hidden = ['no', 'false', 'n', 'hide', 'hidden', '0'].indexOf(show) > -1;
+      return !hidden && (row.title || row.body);
+    })
+    .map(function (row) {
+      return { date: row.date || '', title: row.title || '', body: row.body || '', link: row.link || '' };
+    })
+    .sort(function (a, b) { return String(b.date).localeCompare(String(a.date)); })
+    .slice(0, 12);
 }
 
 async function fetchFeed(url, token) {
@@ -49,8 +80,17 @@ function freeOrPrice(value) {
 
 function normaliseEvent(event) {
   const when = new Date(`${event.date}T12:00:00`);
-  // The events service calls it `url`; the Apps Script calls it `ticketUrl`.
-  const ticket = event.ticketUrl || event.url || '';
+  // Whatever the source decides to call a booking link. The events service
+  // currently sends only `url`, which is its own event page rather than
+  // somewhere you can buy a ticket — so the moment it grows a real one under
+  // any of these names, the cards pick it up with no change here.
+  const ticket =
+    event.ticketUrl || event.ticketLink || event.registrationUrl ||
+    event.bookingUrl || event.checkoutUrl || event.url || '';
+  const isTicket = Boolean(
+    event.ticketUrl || event.ticketLink || event.registrationUrl ||
+    event.bookingUrl || event.checkoutUrl
+  );
   return {
     id: String(event.id || event.name),
     name: String(event.name),
@@ -70,6 +110,7 @@ function normaliseEvent(event) {
     capacity: event.capacity == null ? '' : String(event.capacity),
     callTime: event.callTime || '',
     ticketUrl: /^https?:\/\//.test(ticket) ? ticket : '',
+    ticketIsBooking: isTicket,
     instructors: (event.instructors || [])
       .filter((person) => person && person.name)
       .map(function (person) {
@@ -125,6 +166,7 @@ function normaliseAnnouncement(item) {
 module.exports = async function handler(req, res) {
   const eventsUrl = process.env.EVENTS_FEED_URL || DEFAULT_EVENTS_FEED;
   const workbookUrl = process.env.WORKBOOK_FEED_URL;
+  const csvUrl = process.env.ANNOUNCEMENTS_CSV_URL;
 
   if (!eventsUrl && !workbookUrl) {
     // Still hand back the membership count: it is committed in the repo, not
@@ -144,6 +186,15 @@ module.exports = async function handler(req, res) {
   }
 
   const errors = [];
+  let csvAnnouncements = null;
+  if (csvUrl) {
+    try {
+      csvAnnouncements = await fetchAnnouncementsCsv(csvUrl);
+    } catch (err) {
+      errors.push(`announcements: ${err.message}`);
+    }
+  }
+
   const [eventsRaw, workbookRaw] = await Promise.all(
     [
       [eventsUrl, process.env.EVENTS_FEED_TOKEN, 'events'],
@@ -176,11 +227,11 @@ module.exports = async function handler(req, res) {
     configured: true,
     upcoming: all.filter((e) => e.ms >= floor).sort((a, b) => a.ms - b.ms),
     past: all.filter((e) => e.ms < floor).sort((a, b) => b.ms - a.ms).slice(0, 6),
-    announcements: ((extras && extras.announcements) || []).map(normaliseAnnouncement),
+    announcements: (csvAnnouncements || (extras && extras.announcements) || []).map(normaliseAnnouncement),
     config: withMemberCount((extras && extras.config) || {}),
     generated: (eventSource && eventSource.generated) || null,
     eventSource: eventSourceName,
-    announcementsConfigured: Boolean(workbookUrl || (extras && extras.announcements)),
+    announcementsConfigured: Boolean(csvUrl || workbookUrl || (extras && extras.announcements)),
   };
   if (errors.length) body.error = errors.join('; ');
 

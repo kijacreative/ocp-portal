@@ -46,10 +46,24 @@ independently, so one being absent never takes the other down.
 
 | Panel | Source | Variable |
 | --- | --- | --- |
-| Events | the events service, `events.oakcliffpilates.com/api/feed` | `EVENTS_FEED_URL` |
-| Announcements | the `ANNOUNCEMENTS` tab | `WORKBOOK_FEED_URL` |
-| The 1,000 | the `SITE CONFIG` tab | `WORKBOOK_FEED_URL` |
-| Report a studio issue | appends to the `STUDIO ISSUES` tab | `WORKBOOK_FEED_URL` |
+| Events | the events service | `EVENTS_FEED_URL` — defaults, nothing to set |
+| The 1,000 | `api/_members.js`, committed | none |
+| Announcements | a Google Sheet published as CSV | `ANNOUNCEMENTS_CSV_URL` |
+| Report a studio issue | a Google Form | `ISSUE_FORM_URL` + `ISSUE_FORM_FIELDS` |
+
+Announcements and the issue form both go through ordinary Google Sheets with
+**no credential of any kind** — a published sheet is public CSV over HTTPS, and
+a form accepts a posted response the same way a browser does. That is
+deliberate: it means neither feature needs a Slack app, an Apps Script
+deployment, or a token in Vercel.
+
+**Getting Slack posts into announcements without building a Slack app:** a Zap.
+Slack *New Message Posted to Channel* → Google Sheets *Create Spreadsheet Row*
+into the announcements sheet. Zapier's own Slack connection does the
+authenticating, so there is no app to create and no bot token to hold. Anyone
+can also just type a row. Slack itself cannot be embedded — `app.slack.com`
+serves `x-frame-options: SAMEORIGIN`, so an iframe is refused by the browser,
+and Slack publishes no public feed.
 
 `WORKBOOK_FEED_URL` is the Apps Script web app and is optional. Without it,
 events still work and the other three panels say plainly that they are not

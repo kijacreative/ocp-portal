@@ -52,7 +52,7 @@ description: Internal trainer resource. Unlisted — not for clients.
       <div class="hq-skeleton"><div></div><div></div><div></div></div>
     </div>
     <p class="hq-note" style="margin-top:12px">Something everyone needs to know? Add a row to
-      the <b>ANNOUNCEMENTS</b> tab in the events workbook and it shows up here.</p>
+      the announcements sheet and it shows up here within a minute.</p>
   </section>
 
   <!-- ══ 03 EVENTS ══════════════════════════════════════════════════ -->
@@ -196,11 +196,69 @@ description: Internal trainer resource. Unlisted — not for clients.
         on this page.</strong></p>
     </div>
 
-    <div class="hq-card hq-card--plain" style="margin-top:14px">
-      <div class="hq-eyebrow">Other promo codes and specials</div>
-      <p class="hq-note" style="margin-top:10px">Anything seasonal or partner-specific goes
-        here so there is one list. <span class="hq-tk">Needs content</span></p>
+    <h3 class="hq-h4" style="margin-top:36px" id="codes">Promo codes</h3>
+    <p class="hq-note" style="margin:8px 0 0">Everything we can discount, and who it is for.
+      If a code is not on this list, it does not exist — never invent one.</p>
+
+    <div class="hq-acc" style="margin-top:14px">
+      <button class="hq-acc__btn" type="button" aria-expanded="false" aria-controls="pc-1">
+        <span class="hq-acc__sign"></span>Neighborhood businesses
+      </button>
+      <div class="hq-acc__panel" id="pc-1" hidden>
+        <p><strong>50% off — 4 classes a month</strong> for people who live or work nearby.
+          Send them to <a href="https://oakcliffpilates.com/neighbors" target="_blank" rel="noopener">oakcliffpilates.com/neighbors</a>.</p>
+        <p style="margin-top:12px"><strong>$10 off memberships</strong> — local residents and
+          partner businesses. One code per business:</p>
+        <div class="hq-chips">
+          <span class="hq-code">WAXSPACE</span>
+          <span class="hq-code">VICTORPROSPER</span>
+          <span class="hq-code">THEVICTOR</span>
+          <span class="hq-code">JOURNEYFIT</span>
+          <span class="hq-code">HIDDEN</span>
+          <span class="hq-code">DGXO</span>
+          <span class="hq-code">CBRE</span>
+        </div>
+        <p class="hq-note" style="margin-top:12px">The partner list is still being confirmed —
+          if someone names a business that is not here, check before promising the discount.</p>
+      </div>
     </div>
+
+    <div class="hq-acc">
+      <button class="hq-acc__btn" type="button" aria-expanded="false" aria-controls="pc-2">
+        <span class="hq-acc__sign"></span>Other discounts
+      </button>
+      <div class="hq-acc__panel" id="pc-2" hidden>
+        <div class="hq-codes">
+          <div><span class="hq-code">AUCTIONWINNER</span><p>Free month. <span>Giveaway-bag winners.</span></p></div>
+          <div><span class="hq-code">SPINTHEWHEEL</span><p>Event prize. <span>Spin-the-wheel winners.</span></p></div>
+          <div><span class="hq-code">COMEBACK</span><p>$10 off memberships for 12 months. <span>Clients away 6+ months.</span></p></div>
+          <div><span class="hq-code">FRONTLINE</span><p>$10 off. <span>Nurses and first responders.</span></p></div>
+          <div><span class="hq-code">MILITARY</span><p>$10 off. <span>Active military.</span></p></div>
+          <div><span class="hq-code">TEACH</span><p>$10 off. <span>Teachers.</span></p></div>
+          <div><span class="hq-code hq-code--staff">ADMIN</span><p><strong>Staff only — 100% off.</strong>
+            <span>Use only to comp something when there is a service issue. It is not a client
+            discount and it does not go to a member who asks nicely.</span></p></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="hq-acc">
+      <button class="hq-acc__btn" type="button" aria-expanded="false" aria-controls="pc-3">
+        <span class="hq-acc__sign"></span>Automatic discounts<span class="hq-level">Applied for you</span>
+      </button>
+      <div class="hq-acc__panel" id="pc-3" hidden>
+        <p>These apply themselves to the right accounts. You will usually never type them.</p>
+        <div class="hq-codes">
+          <div><span class="hq-code hq-code--auto">VIP20</span><p>20% off retail. <span>VIP — unlimited members.</span></p></div>
+          <div><span class="hq-code hq-code--auto">XTRAOCP</span><p>50% off packages. <span>Any membership adding extra classes.</span></p></div>
+          <div><span class="hq-code hq-code--auto">AMBASSADORS</span><p>50% off retail. <span>Employees in the ambassador program.</span></p></div>
+        </div>
+      </div>
+    </div>
+
+    <p class="hq-note" style="margin-top:14px">Sections 01–03 of the promo code sheet were not
+      in what was sent over — the intro offers and trainer code above may be all of it, or there
+      may be more to add. <span class="hq-tk">Needs checking</span></p>
   </section>
 
   <!-- ══ 05 THE 1,000 ═══════════════════════════════════════════════ -->
@@ -442,18 +500,27 @@ description: Internal trainer resource. Unlisted — not for clients.
     <div class="hq-grid hq-grid--2" style="margin-top:28px">
       <div class="hq-card">
         <div class="hq-eyebrow">Parking validations</div>
-        <h3 class="hq-h3" style="margin:10px 0 0">Bishop Arts &amp; Uptown</h3>
+        <h3 class="hq-h3" style="margin:10px 0 0">Two scans, every studio</h3>
+        <p class="hq-note" style="margin-top:12px">Validation is available at all three studios
+          now. It only works if the member does both halves, and the first one catches people
+          out — say it before class, not after.</p>
+        <ol class="hq-steps">
+          <li><strong>Scan the QR code in the garage</strong> to start a parking session. First
+            time, this means setting up an account with the parking operator — they will need
+            their license plate and vehicle details.</li>
+          <li><strong>Scan the QR code at the front desk</strong> to validate the session.</li>
+        </ol>
+        <p class="hq-note" style="margin-top:14px">If a member is stuck, the operator sorts it
+          out, not us. They will be asked for their license plate and vehicle information:</p>
         <ul class="hq-list">
-          <li>The client scans the QR code to start a parking session in the garage.</li>
-          <li>Then they scan the QR code at the front desk for a two-hour validation.</li>
+          <li><strong>Lower Greenville:</strong> <a href="https://universalparking.com" target="_blank" rel="noopener">universalparking.com</a></li>
+          <li><strong>Uptown:</strong> <a href="mailto:cs@parkingsystemsofamerica.com">cs@parkingsystemsofamerica.com</a></li>
+          <li><strong>Bishop Arts:</strong> <a href="mailto:help@metropolis.io">help@metropolis.io</a></li>
         </ul>
-        <p class="hq-note" style="margin-top:14px">Lower Greenville: confirm the current
-          arrangement before telling a client anything.
-          <span class="hq-tk">Needs confirming</span></p>
       </div>
 
       <div class="hq-card">
-        <div class="hq-eyebrow">Retail</div>
+      <div class="hq-eyebrow">Retail</div>
         <h3 class="hq-h3" style="margin:10px 0 0">Everything is paid for before it leaves</h3>
         <ul class="hq-list">
           <li>Clients must pay for all purchases before leaving the studio.</li>
@@ -616,19 +683,17 @@ description: Internal trainer resource. Unlisted — not for clients.
 
     <div class="hq-grid hq-grid--2" style="margin-top:14px">
       <div class="hq-card hq-card--plain">
-        <div class="hq-eyebrow">Studio parking registration</div>
-        <ul class="hq-links">
-          <li><span>Bishop Arts <em><span class="hq-tk">Link needed</span></em></span></li>
-          <li><span>Uptown <em><span class="hq-tk">Link needed</span></em></span></li>
-          <li><span>Lower Greenville <em><span class="hq-tk">Link needed</span></em></span></li>
-        </ul>
-        <p class="hq-note" style="margin-top:12px">Register before your first shift at a
-          studio — trainer parking is not the same as the client validation above.</p>
+        <div class="hq-eyebrow">Parking while you work</div>
+        <h3 class="hq-h3" style="margin:10px 0 0">We register your car for you</h3>
+        <p class="hq-note" style="margin-top:12px">Trainer parking is not the same as the
+          client validation. Send your <strong>license plate and email</strong> to
+          <a href="mailto:Charley@oakcliffpilates.com">Charley@oakcliffpilates.com</a> and you
+          will be set up at the studios you teach at. Do this before your first shift.</p>
       </div>
       <div class="hq-card hq-card--plain">
         <div class="hq-eyebrow">Payroll</div>
         <ul class="hq-links">
-          <li><span>Payroll portal <em><span class="hq-tk">Link needed</span></em></span></li>
+          <li><a href="https://gusto.com" target="_blank" rel="noopener">Gusto <em>Payroll portal</em></a></li>
           <li><a href="https://docs.google.com/spreadsheets/d/1ksFJqCPeZXEf2iIXxJN3kzvp5mVk6w6bEj8up9NumBw/edit" target="_blank" rel="noopener">2026 pay periods <em>Sheet</em></a></li>
         </ul>
         <p class="hq-note" style="margin-top:12px">Payroll questions go to
@@ -661,8 +726,14 @@ description: Internal trainer resource. Unlisted — not for clients.
 
     <div class="hq-card hq-card--plain" style="margin-top:14px">
       <div class="hq-eyebrow">Staff benefits</div>
-      <p class="hq-note" style="margin-top:10px">The memberships and discounts staff get,
-        and how to claim them. <span class="hq-tk">Needs content</span></p>
+      <h3 class="hq-h3" style="margin:10px 0 0">What you get around the neighbourhood</h3>
+      <ul class="hq-list">
+        <li><strong>20% off food</strong> at HG Sply Co.</li>
+        <li><strong>Free yoga membership</strong> at Black Swan — any studio.</li>
+        <li><strong>5 complimentary classes</strong> at MADabolic, Bishop Arts.</li>
+      </ul>
+      <p class="hq-note" style="margin-top:14px">Email
+        <a href="mailto:kiel@oakcliffpilates.com">kiel@oakcliffpilates.com</a> for more info.</p>
     </div>
 
     <h3 class="hq-h4" style="margin-top:36px" id="howtos">Arketa how-tos</h3>
@@ -712,53 +783,129 @@ description: Internal trainer resource. Unlisted — not for clients.
 
     <div class="hq-card" style="margin-top:32px">
       <div class="hq-eyebrow">Bonus programme — trainers</div>
-      <h3 class="hq-h3" style="margin:10px 0 0">Quarterly bonus</h3>
-      <p class="hq-note" style="margin-top:10px">
-        <strong>Proposed — not yet in effect.</strong> Full detail in the
-        <a href="https://docs.google.com/document/d/11G8V1PHvrHYahp56XRzoOIXEWt7HfHQsrD91YZByuH0/edit" target="_blank" rel="noopener">proposal document</a>.
-      </p>
+      <h3 class="hq-h3" style="margin:10px 0 0">Coming soon</h3>
+      <p class="hq-note" style="margin-top:12px">A quarterly bonus tied to your schedule,
+        subbing, reliability and class performance is being worked out. Nothing is in effect
+        yet — we will put the detail here once it is settled.</p>
+    </div>
 
-      <div class="hq-grid hq-grid--2" style="margin-top:18px">
-        <div>
-          <h4 class="hq-h4">The opportunity</h4>
-          <ul class="hq-list">
-            <li><strong>8 or fewer weekly classes</strong> (averaged per quarter) — up to
-              <strong>$500 a year</strong>, or $125 a quarter.</li>
-            <li><strong>9 or more weekly classes</strong> (averaged per quarter) — up to
-              <strong>$1,000 a year</strong>, or $250 a quarter.</li>
-          </ul>
-        </div>
-        <div>
-          <h4 class="hq-h4">Must meet all three</h4>
-          <ul class="hq-list">
-            <li><strong>Schedule commitment:</strong> teach at least 80% of your regularly
-              scheduled classes for the quarter.</li>
-            <li><strong>Team support:</strong> sub at least 2 classes in the quarter.</li>
-            <li><strong>Reliability:</strong> zero documented no-shows or late arrivals.</li>
-          </ul>
+    <h3 class="hq-h4" style="margin-top:36px" id="frontdesk">Front desk</h3>
+    <p class="hq-note" style="margin:8px 0 14px">The standard for every shift, at every studio.
+      If you are on the desk, you own the space — how it looks, how it sounds, and how every
+      member feels walking through the door.</p>
+
+    <div class="hq-acc">
+      <button class="hq-acc__btn" type="button" aria-expanded="false" aria-controls="fd-1">
+        <span class="hq-acc__sign"></span>Shift schedule
+      </button>
+      <div class="hq-acc__panel" id="fd-1" hidden>
+        <div class="hq-tablewrap">
+          <table class="hq-table">
+            <thead><tr><th>Days</th><th>Shift</th><th>Hours</th></tr></thead>
+            <tbody>
+              <tr><td>Monday – Friday</td><td>Morning</td><td>7:30 AM – 12:30 PM <b>5 hrs</b></td></tr>
+              <tr><td>Monday – Friday</td><td>Evening</td><td>3:30 PM – 8:30 PM <b>5 hrs</b></td></tr>
+              <tr><td>Saturday – Sunday</td><td>Morning</td><td>7:00 AM – 12:00 PM <b>5 hrs</b></td></tr>
+              <tr><td>Saturday – Sunday</td><td>Afternoon</td><td>11:00 AM – 4:00 PM <b>5 hrs</b></td></tr>
+            </tbody>
+          </table>
         </div>
       </div>
-
-      <h4 class="hq-h4" style="margin-top:22px">Plus at least two of these</h4>
-      <ul class="hq-list">
-        <li><strong>Staff engagement:</strong> attend an all-staff event held during the
-          quarter, if there is one.</li>
-        <li><strong>Client experience:</strong> receive a 5-star review or other validated
-          positive client feedback attributable to you.</li>
-        <li><strong>Professional development:</strong> attend at least one OCP
-          professional-development opportunity in the quarter.</li>
-        <li><strong>Class performance:</strong> maintain at least 55% average utilisation
-          across your eligible regularly scheduled classes.</li>
-      </ul>
     </div>
 
-    <div class="hq-card hq-card--plain" style="margin-top:14px">
-      <div class="hq-eyebrow">Front desk</div>
-      <h3 class="hq-h3" style="margin:10px 0 0">To-do list &amp; desk resources</h3>
-      <p class="hq-note" style="margin-top:10px">The opening, mid-day and closing desk
-        checklist, and whatever the desk needs to hand.
-        <span class="hq-tk">Needs content</span></p>
+    <div class="hq-acc">
+      <button class="hq-acc__btn" type="button" aria-expanded="false" aria-controls="fd-2">
+        <span class="hq-acc__sign"></span>Daily maintenance<span class="hq-level">Every day</span>
+      </button>
+      <div class="hq-acc__panel" id="fd-2" hidden>
+        <p>This gets done every single day — no exceptions.</p>
+        <h4 class="hq-h4" style="margin-top:18px">Morning shift</h4>
+        <ul class="hq-list">
+          <li>Organise the front desk.</li>
+          <li>Restock the fridge and coffee station.</li>
+          <li>Wipe mirrors and check for smudges.</li>
+          <li>Check front doors and windows for fingerprints; clean with glass cleaner.</li>
+          <li>Check all trash cans — take out anything full and wipe the can down.</li>
+          <li>Check the bathroom for paper on the floor or any messes and clean up.</li>
+          <li>Check bathroom supplies and restock. Log anything running low.</li>
+          <li>Pull out mats, vacuum mats and under the reformers, and wipe down the reformers.</li>
+          <li>Clean up anything left behind by members after class.</li>
+        </ul>
+        <h4 class="hq-h4" style="margin-top:20px">Evening shift</h4>
+        <ul class="hq-list">
+          <li>Take trash to the dumpster.</li>
+          <li>Make sure all doors are locked before leaving.</li>
+          <li>Make sure mics and speakers are plugged in.</li>
+          <li>Make sure computers are plugged in and charging.</li>
+          <li>Pull out mats, vacuum mats and under the reformers, and wipe down the reformers.</li>
+          <li>Check the bathroom for paper on the floor or any messes and clean up.</li>
+          <li>Make sure there are enough wipes for the next day.</li>
+        </ul>
+      </div>
     </div>
+
+    <div class="hq-acc">
+      <button class="hq-acc__btn" type="button" aria-expanded="false" aria-controls="fd-3">
+        <span class="hq-acc__sign"></span>Daily client engagement
+      </button>
+      <div class="hq-acc__panel" id="fd-3" hidden>
+        <ul class="hq-list">
+          <li>Check all emails and text messages. <strong>Respond in under 12 hours.</strong></li>
+          <li>Check members in, or help them check themselves in, before class.</li>
+          <li>Greet members and acknowledge them by name.</li>
+          <li>Make a list of all intro-offer clients and write each one a personalised note on a card.</li>
+          <li>Follow up with new clients by text, email and phone.</li>
+          <li>Follow the sales process.</li>
+          <li>Review milestones. Note the ones coming up so we can congratulate them, have the
+            gift and certificate ready, and hand it over at their next class.</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="hq-acc">
+      <button class="hq-acc__btn" type="button" aria-expanded="false" aria-controls="fd-4">
+        <span class="hq-acc__sign"></span>Milestones
+      </button>
+      <div class="hq-acc__panel" id="fd-4" hidden>
+        <div class="hq-tablewrap">
+          <table class="hq-table">
+            <thead><tr><th>Milestone</th><th>Recognition</th></tr></thead>
+            <tbody>
+              <tr><td>50 classes</td><td>Certificate</td></tr>
+              <tr><td>100 classes</td><td>Certificate + coin</td></tr>
+              <tr><td>250 classes</td><td>Certificate + coin + socks</td></tr>
+              <tr><td>500 classes</td><td>Certificate + coin + socks + water bottle</td></tr>
+              <tr><td>750 classes</td><td>Certificate + coin + socks + water bottle + <b>$100 gift card</b></td></tr>
+              <tr><td>1,000 classes</td><td>Certificate + coin + socks + water bottle + <b>$250 gift card</b></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="hq-acc">
+      <button class="hq-acc__btn" type="button" aria-expanded="false" aria-controls="fd-5">
+        <span class="hq-acc__sign"></span>Weekend shift &amp; beyond the desk
+      </button>
+      <div class="hq-acc__panel" id="fd-5" hidden>
+        <h4 class="hq-h4">Weekends</h4>
+        <p style="margin-top:8px">Everything above, plus:</p>
+        <ul class="hq-list">
+          <li>Set up the table and spin-the-wheel out front.</li>
+          <li>Set up clothing racks out front and hand out flyers.</li>
+        </ul>
+        <h4 class="hq-h4" style="margin-top:20px">Expected of everyone on the desk</h4>
+        <ul class="hq-list">
+          <li>Attend events — either as a guest or to help run them.</li>
+          <li>Walk the neighbourhood and introduce OCP to neighbouring businesses and residents.</li>
+          <li>Attend classes.</li>
+        </ul>
+      </div>
+    </div>
+
+    <p class="hq-note" style="margin-top:14px">Low on something, broken reformer, or anything
+      the next shift needs to know? <a href="#studio-issue">Log it</a> — it is the same form
+      as a studio issue, and it is how the next person finds out.</p>
 
     <div class="hq-card" style="margin-top:14px">
       <div class="hq-eyebrow">Who to ask</div>

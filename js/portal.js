@@ -82,8 +82,7 @@
 
     if (data.configured === false || data.announcementsConfigured === false) {
       box.innerHTML =
-        '<div class="hq-empty">Announcements are not connected yet. They come from the ' +
-        '<b>ANNOUNCEMENTS</b> tab in the events workbook.</div>';
+        '<div class="hq-empty">Announcements are not connected yet.</div>';
       status(light, false, 'Not connected');
       return;
     }
