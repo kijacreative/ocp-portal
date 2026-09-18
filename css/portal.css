@@ -297,7 +297,6 @@
   text-transform:uppercase;background:var(--ocp-black);color:var(--ocp-gold);
   border:1px solid var(--border-hairline);border-radius:var(--radius-sm);padding:7px 10px;
 }
-.hq-code--staff{background:var(--ocp-hot-red);color:var(--ocp-paper);border-color:var(--ocp-hot-red)}
 .hq-code--auto{background:transparent;color:var(--ocp-gold-warm);border-style:dashed}
 .hq-chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
 .hq-chips .hq-code{justify-self:auto}

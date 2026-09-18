@@ -36,9 +36,49 @@ function startOfToday() {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate()).getTime();
 }
 
-/* Announcements from a published sheet. Columns, by header name:
- * Date, Title, Body, Link, Show On Site. Anything else is ignored, and a row
- * saying no under Show On Site is skipped. */
+/* Announcements from a published sheet.
+ *
+ * Reads the columns a Google Form drops into its response sheet as-is —
+ * Timestamp, Title, Message, Link — so a form can be pointed at a sheet and
+ * published without anyone renaming a header. Date/Body work too, for a sheet
+ * somebody types into directly. A row is shown unless a Show On Site column
+ * says otherwise, because a form has no such column and the answer for a
+ * freshly submitted announcement should be yes. */
+const COLUMN = {
+  date: ['date', 'timestamp'],
+  title: ['title', 'headline', 'subject'],
+  body: ['body', 'message', 'details', 'announcement'],
+  link: ['link', 'url'],
+  show: ['show on site', 'show', 'publish'],
+};
+
+function pick(row, names) {
+  for (const name of names) {
+    if (row[name] != null && String(row[name]).trim() !== '') return String(row[name]).trim();
+  }
+  return '';
+}
+
+/* Sheets hand back whatever the locale wrote: an ISO date from a typed cell,
+ * or "9/17/2026 14:23:45" from a form timestamp. Sorting by string would put
+ * September before March, so both are turned into a real date. */
+function readDate(value) {
+  const text = String(value || '').trim();
+  if (!text) return { iso: '', ms: 0 };
+  const iso = /^(\d{4})-(\d{2})-(\d{2})/.exec(text);
+  if (iso) return { iso: iso[0], ms: Date.parse(`${iso[0]}T12:00:00Z`) || 0 };
+  const us = /^(\d{1,2})\/(\d{1,2})\/(\d{4})(?:[ ,]+(\d{1,2}):(\d{2}))?/.exec(text);
+  if (us) {
+    const [, m, d, y, hh = '12', mm = '00'] = us;
+    const pad = (n) => String(n).padStart(2, '0');
+    return {
+      iso: `${y}-${pad(m)}-${pad(d)}`,
+      ms: Date.UTC(+y, +m - 1, +d, +hh, +mm),
+    };
+  }
+  const loose = Date.parse(text);
+  return Number.isNaN(loose) ? { iso: '', ms: 0 } : { iso: text.slice(0, 10), ms: loose };
+}
 async function fetchAnnouncementsCsv(url) {
   const response = await fetch(url, { redirect: 'follow' });
   if (!response.ok) throw new Error(`sheet returned ${response.status}`);
@@ -50,15 +90,22 @@ async function fetchAnnouncementsCsv(url) {
   }
   return csv
     .toObjects(text)
-    .filter(function (row) {
-      const show = (row['show on site'] || '').toLowerCase();
-      const hidden = ['no', 'false', 'n', 'hide', 'hidden', '0'].indexOf(show) > -1;
-      return !hidden && (row.title || row.body);
-    })
     .map(function (row) {
-      return { date: row.date || '', title: row.title || '', body: row.body || '', link: row.link || '' };
+      const when = readDate(pick(row, COLUMN.date));
+      return {
+        date: when.iso,
+        ms: when.ms,
+        title: pick(row, COLUMN.title),
+        body: pick(row, COLUMN.body),
+        link: pick(row, COLUMN.link),
+        show: pick(row, COLUMN.show),
+      };
     })
-    .sort(function (a, b) { return String(b.date).localeCompare(String(a.date)); })
+    .filter(function (item) {
+      const hidden = ['no', 'false', 'n', 'hide', 'hidden', '0'].indexOf(item.show.toLowerCase()) > -1;
+      return !hidden && (item.title || item.body);
+    })
+    .sort(function (a, b) { return b.ms - a.ms; })
     .slice(0, 12);
 }
 

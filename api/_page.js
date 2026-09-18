@@ -16,8 +16,8 @@ const PAGE = `<!DOCTYPE html>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Khand:wght@400;500;600;700&family=Montserrat:wght@300;400;600;700;900&display=swap">
 <link rel="stylesheet" href="/css/tokens.css">
-<link rel="stylesheet" href="/css/base.css?v=fe74e77cd9">
-<link rel="stylesheet" href="/css/portal.css?v=fe74e77cd9">
+<link rel="stylesheet" href="/css/base.css?v=5e45d29ab9">
+<link rel="stylesheet" href="/css/portal.css?v=5e45d29ab9">
 </head>
 
 <body class="hq">
@@ -77,8 +77,9 @@ const PAGE = `<!DOCTYPE html>
     <div class="hq-card hq-card--plain" id="hq-announcements">
       <div class="hq-skeleton"><div></div><div></div><div></div></div>
     </div>
-    <p class="hq-note" style="margin-top:12px">Something everyone needs to know? Add a row to
-      the announcements sheet and it shows up here within a minute.</p>
+    <p class="hq-note" style="margin-top:12px">Something everyone needs to know? Fill in the
+      announcements form — title, message, and a link if there is one — and it shows up here.
+      Ask Isabel or Charley for the form link.</p>
   </section>
 
   <!-- ══ 03 EVENTS ══════════════════════════════════════════════════ -->
@@ -261,9 +262,6 @@ const PAGE = `<!DOCTYPE html>
           <div><span class="hq-code">FRONTLINE</span><p>$10 off. <span>Nurses and first responders.</span></p></div>
           <div><span class="hq-code">MILITARY</span><p>$10 off. <span>Active military.</span></p></div>
           <div><span class="hq-code">TEACH</span><p>$10 off. <span>Teachers.</span></p></div>
-          <div><span class="hq-code hq-code--staff">ADMIN</span><p><strong>Staff only — 100% off.</strong>
-            <span>Use only to comp something when there is a service issue. It is not a client
-            discount and it does not go to a member who asks nicely.</span></p></div>
         </div>
       </div>
     </div>
@@ -539,7 +537,7 @@ const PAGE = `<!DOCTYPE html>
         <p class="hq-note" style="margin-top:14px">If a member is stuck, the operator sorts it
           out, not us. They will be asked for their license plate and vehicle information:</p>
         <ul class="hq-list">
-          <li><strong>Lower Greenville:</strong> <a href="https://universalparking.com" target="_blank" rel="noopener">universalparking.com</a></li>
+          <li><strong>Lower Greenville:</strong> <a href="mailto:lg@universalparking.com">lg@universalparking.com</a></li>
           <li><strong>Uptown:</strong> <a href="mailto:cs@parkingsystemsofamerica.com">cs@parkingsystemsofamerica.com</a></li>
           <li><strong>Bishop Arts:</strong> <a href="mailto:help@metropolis.io">help@metropolis.io</a></li>
         </ul>
@@ -957,7 +955,7 @@ const PAGE = `<!DOCTYPE html>
   </main>
 </div>
 
-<script src="/js/portal.js?v=fe74e77cd9" defer></script>
+<script src="/js/portal.js?v=5e45d29ab9" defer></script>
 </body>
 </html>
 `;
@@ -966,4 +964,4 @@ function render() {
   return PAGE;
 }
 
-module.exports = { render, version: "fe74e77cd9" };
+module.exports = { render, version: "5e45d29ab9" };
