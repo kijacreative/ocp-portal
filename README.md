@@ -48,7 +48,7 @@ independently, so one being absent never takes the other down.
 | --- | --- | --- |
 | Events | the events service | `EVENTS_FEED_URL` — defaults, nothing to set |
 | The 1,000 | `api/_members.js`, committed | none |
-| Announcements | a Google Sheet published as CSV | `ANNOUNCEMENTS_CSV_URL` |
+| Announcements | a Google Sheet read as CSV | `ANNOUNCEMENTS_CSV_URL` — defaults |
 | Report a studio issue | a Google Form | `ISSUE_FORM_URL` + `ISSUE_FORM_FIELDS` |
 
 Announcements and the issue form both go through ordinary Google Sheets with
@@ -56,6 +56,33 @@ Announcements and the issue form both go through ordinary Google Sheets with
 a form accepts a posted response the same way a browser does. That is
 deliberate: it means neither feature needs a Slack app, an Apps Script
 deployment, or a token in Vercel.
+
+### The announcements form
+
+Announcements come from a Google Form into its response sheet, which the page
+reads through the gviz CSV endpoint — that works on any sheet shared as "anyone
+with the link can view", with no publish step and no credential. The sheet id is
+in `api/hq/events.js` so a fresh deploy works with nothing configured.
+
+Which means **that sheet is readable by anyone holding the URL, and the URL is
+in this repo.** Everything in it is bound for a public page anyway, but do not
+keep anything in it you would not publish.
+
+The form's own `Timestamp, Title, Message, Link` headers are read as-is —
+nothing needs renaming. A sheet somebody types into works too, with
+`Date, Title, Body, Link` and an optional `Show On Site` column to hide a row.
+
+### The studio issues form
+
+`tools/apps-script/create-issue-form.gs` builds it. Paste it into
+script.google.com, run `createStudioIssuesForm`, and the log gives you the form
+link, the response sheet, and the two values to set.
+
+It exists because the portal posts to the form as a browser would, which needs
+each question's `entry.NNN` id — and Forms does not show those anywhere. The
+usual advice is to View Source on the live form and pick them out by hand. The
+script instead prefills a response with sentinel values, generates the prefilled
+link, and reads the ids back out of it.
 
 **Getting Slack posts into announcements without building a Slack app:** a Zap.
 Slack *New Message Posted to Channel* → Google Sheets *Create Spreadsheet Row*

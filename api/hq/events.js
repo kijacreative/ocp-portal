@@ -28,6 +28,18 @@ const csv = require('../_lib/csv');
  * web app if events ever move back to the workbook. */
 const DEFAULT_EVENTS_FEED = 'https://events.oakcliffpilates.com/api/feed';
 
+/* The announcements sheet, read through the gviz CSV endpoint — which works on
+ * any sheet shared as "anyone with the link can view", with no publishing step
+ * and no credential. Defaulted for the same reason as the events feed: the
+ * page should work on a fresh deploy with nothing configured.
+ *
+ * It follows that this sheet is readable by anyone who has this URL, and this
+ * URL is in the repo. Everything in it is bound for a public page anyway —
+ * but do not keep anything in that sheet you would not publish. */
+const SHEET_ID = '1ydFIE2eJYmlign-i4Py_aEb4TY5hU9SVLBWMQw4hzRA';
+const DEFAULT_ANNOUNCEMENTS_CSV =
+  `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:csv`;
+
 const TTL = 2 * 60 * 1000;
 let cache = null;
 
@@ -213,7 +225,7 @@ function normaliseAnnouncement(item) {
 module.exports = async function handler(req, res) {
   const eventsUrl = process.env.EVENTS_FEED_URL || DEFAULT_EVENTS_FEED;
   const workbookUrl = process.env.WORKBOOK_FEED_URL;
-  const csvUrl = process.env.ANNOUNCEMENTS_CSV_URL;
+  const csvUrl = process.env.ANNOUNCEMENTS_CSV_URL || DEFAULT_ANNOUNCEMENTS_CSV;
 
   if (!eventsUrl && !workbookUrl) {
     // Still hand back the membership count: it is committed in the repo, not
