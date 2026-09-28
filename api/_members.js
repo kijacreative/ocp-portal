@@ -9,8 +9,8 @@
  * Edit it by running the script, not by hand: the script validates the number
  * and stamps the date, so the page can never claim a count it did not take. */
 module.exports = {
-  active_members: 707,
+  active_members: 711,
   member_goal: 1000,
-  updated: 'Sep 17, 2026',
+  updated: 'Sep 28, 2026',
   basis: 'Arketa active subscriptions, substatus active + canceling',
 };
