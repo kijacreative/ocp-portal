@@ -72,6 +72,22 @@ The form's own `Timestamp, Title, Message, Link` headers are read as-is —
 nothing needs renaming. A sheet somebody types into works too, with
 `Date, Title, Body, Link` and an optional `Show On Site` column to hide a row.
 
+### The opt-in is not a signature
+
+The bonus section asks trainers to confirm they have read the requirements, and
+the brief calls that "a signed acknowledgment we can rely on later". **It is
+not one, and it cannot be on this page.** There is no sign-in, so the endpoint
+records that somebody submitted a name and an email. It does not establish that
+the person named is the person who typed it, and anyone with the URL can submit
+anything. The rate limit stops volume, not impersonation.
+
+It is fine as an "I have read this" where everyone is acting in good faith. If
+it has to hold up in a disagreement about money, it needs an identity behind
+it. The cheapest fix is a Google Form with *Restrict to users in your
+organisation* and *Collect email addresses* turned on, linked from the page
+instead of posted to by it — Google then records a verified account against
+each response. That only works if every trainer has a workspace account.
+
 ### The studio issues form
 
 `tools/apps-script/create-issue-form.gs` builds it. Paste it into
