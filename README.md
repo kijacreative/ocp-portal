@@ -12,32 +12,35 @@ dependencies, no build step on the host.
 node tools/dev.js   # → http://localhost:4333
 ```
 
-## There is no sign-in
+## The gate
 
-The page is **public but unlisted**: no login, `noindex, nofollow, noarchive`
-on every response, `Disallow: /` in robots.txt, and in no sitemap. Anyone with
-the URL can read it, including former staff and anyone they forward it to, and
-it carries per-event pay rates, the trainer promo code and the bonus-scheme
-figures. Share the link with that in mind.
+One shared studio passcode in `HQ_PASSCODE`. Entering it sets a cookie carrying
+nothing but an expiry and a signature, good for 30 days; `/api/hq/lock` clears
+it on a shared device.
 
-It was built with Slack sign-in first. That was removed deliberately — standing
-up a Slack app was blocking launch — and the code is in git history
-(`git log --diff-filter=D -- api/auth`) if it is ever wanted back. A shared
-passcode is the cheaper middle option: one env var and a cookie, roughly an
-afternoon.
+The signing key is derived from the passcode rather than kept separately, so
+there is one secret to manage and **changing the passcode signs everyone out** —
+which is what anyone changing it expects. Both the passcode comparison and the
+signature check are constant-time, and wrong guesses are rate limited to ten per
+address per ten minutes.
 
-It is still served by a function rather than as a static file. `vercel.json`
-rewrites `/` to `api/hq/page.js`, which returns `api/_page.js` — compiled from
-`src/` by `tools/build.py`. That keeps the page assembled from one source, and
-guarantees the noindex headers on every response rather than trusting a meta tag.
+**It fails closed.** With `HQ_PASSCODE` unset the page returns 503 and renders
+nothing but the lock screen. An unset variable must not mean an open page: this
+page carries the door codes for all three studios.
+
+`vercel.json` rewrites `/` to `api/hq/page.js`, which holds the compiled page in
+`api/_page.js` — inside `api/` with a leading underscore, which Vercel treats as
+a module rather than a route. There is no URL that serves the page around the
+check. `api/hq/events.js` and `api/hq/issue.js` answer 401 without the cookie,
+so the data behind the gate is not readable by skipping the page.
+
+What this is not: individual accounts. One code shared by the team gets
+forwarded, and revoking it means telling everyone a new one. It stops the page
+being readable by anyone who finds the URL; it does not tell you who read it.
 
 ```bash
-python3 tools/build.py    # after editing src/, css/portal.css or js/portal.js
+HQ_PASSCODE=whatever node tools/dev.js   # → http://localhost:4333
 ```
-
-**Run it after every change to those three**, including CSS and JS — it stamps a
-content hash into their `?v=` query strings, which is what gets a change past the
-year-long immutable cache on `/css` and `/js`.
 
 ## Where the content comes from
 

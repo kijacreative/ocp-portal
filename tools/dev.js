@@ -48,6 +48,10 @@ function readBody(req) {
     let raw = '';
     req.on('data', function (chunk) { raw += chunk; });
     req.on('end', function () {
+      // Vercel hands JSON bodies back parsed and form bodies back as a string;
+      // match that, or the passcode form behaves differently here than live.
+      const type = req.headers['content-type'] || '';
+      if (type.indexOf('application/x-www-form-urlencoded') > -1) return resolve(raw);
       try { resolve(JSON.parse(raw || '{}')); } catch (err) { resolve({}); }
     });
   });

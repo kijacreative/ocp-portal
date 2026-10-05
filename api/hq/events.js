@@ -20,6 +20,7 @@
  * Both URLs and their tokens stay on the server; the browser only ever sees
  * the normalised result. */
 const { json } = require('../_lib/http');
+const { requireUnlocked } = require('../_lib/session');
 const csv = require('../_lib/csv');
 
 /* The events service is public and needs no token, so it is the default rather
@@ -223,6 +224,8 @@ function normaliseAnnouncement(item) {
 }
 
 module.exports = async function handler(req, res) {
+  if (!requireUnlocked(req, res)) return;
+
   const eventsUrl = process.env.EVENTS_FEED_URL || DEFAULT_EVENTS_FEED;
   const workbookUrl = process.env.WORKBOOK_FEED_URL;
   const csvUrl = process.env.ANNOUNCEMENTS_CSV_URL || DEFAULT_ANNOUNCEMENTS_CSV;

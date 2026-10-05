@@ -1,0 +1,24 @@
+<!--#include head-->
+<body class="hq">
+<main class="hq-gate">
+  <div class="hq-gate__card">
+    <img class="logo-puck logo-puck--glow" src="/img/logo-puck.png" alt="Oak Cliff Pilates" width="66" height="66">
+    <h1>Trainer HQ</h1>
+    <p>Everything you need before you step on the floor. Enter the studio
+       passcode to carry on.</p>
+
+    <form method="POST" action="/api/hq/unlock" class="hq-unlock">
+      <label class="hq-sr" for="pass">Studio passcode</label>
+      <input id="pass" name="passcode" type="password" required autofocus
+             autocomplete="current-password" placeholder="Studio passcode"
+             enterkeyhint="go">
+      <button class="btn btn--primary btn--full" type="submit">Unlock</button>
+      {{error}}
+    </form>
+
+    <p class="hq-gate__foot">Ask Charley if you do not have it. Do not share it
+       outside the team — this page has door codes on it.</p>
+  </div>
+</main>
+</body>
+</html>

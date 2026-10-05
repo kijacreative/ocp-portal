@@ -16,6 +16,7 @@
  * list, and one browser only gets a few reports a minute. The destination is a
  * spreadsheet either way, so the worst case is rows somebody deletes. */
 const { json } = require('../_lib/http');
+const { requireUnlocked } = require('../_lib/session');
 
 const LOCATIONS = ['Bishop Arts', 'Uptown', 'Lower Greenville'];
 const AREAS = ['Lobby & front desk', 'Reformer studio', 'Bathrooms', 'Equipment', 'Building & access', 'Something else'];
@@ -91,6 +92,7 @@ async function sendToWorkbook(report) {
 }
 
 module.exports = async function handler(req, res) {
+  if (!requireUnlocked(req, res)) return;
   if (req.method !== 'POST') return json(res, 405, { error: 'Use POST.' });
 
   const hasForm = Boolean(process.env.ISSUE_FORM_URL);

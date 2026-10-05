@@ -16,8 +16,8 @@ const PAGE = `<!DOCTYPE html>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Khand:wght@400;500;600;700&family=Montserrat:wght@300;400;600;700;900&display=swap">
 <link rel="stylesheet" href="/css/tokens.css">
-<link rel="stylesheet" href="/css/base.css?v=5e45d29ab9">
-<link rel="stylesheet" href="/css/portal.css?v=5e45d29ab9">
+<link rel="stylesheet" href="/css/base.css?v=8c9acf5d5a">
+<link rel="stylesheet" href="/css/portal.css?v=8c9acf5d5a">
 </head>
 
 <body class="hq">
@@ -1063,7 +1063,51 @@ const PAGE = `<!DOCTYPE html>
   </main>
 </div>
 
-<script src="/js/portal.js?v=5e45d29ab9" defer></script>
+<script src="/js/portal.js?v=8c9acf5d5a" defer></script>
+</body>
+</html>
+`;
+
+const LOCK = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trainer HQ — Oak Cliff Pilates</title>
+<meta name="robots" content="noindex, nofollow, noarchive">
+<meta name="referrer" content="same-origin">
+<meta name="theme-color" content="#0B0B0B">
+<link rel="icon" href="/favicon.png" type="image/png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Khand:wght@400;500;600;700&family=Montserrat:wght@300;400;600;700;900&display=swap">
+<link rel="stylesheet" href="/css/tokens.css">
+<link rel="stylesheet" href="/css/base.css?v=8c9acf5d5a">
+<link rel="stylesheet" href="/css/portal.css?v=8c9acf5d5a">
+</head>
+
+<body class="hq">
+<main class="hq-gate">
+  <div class="hq-gate__card">
+    <img class="logo-puck logo-puck--glow" src="/img/logo-puck.png" alt="Oak Cliff Pilates" width="66" height="66">
+    <h1>Trainer HQ</h1>
+    <p>Everything you need before you step on the floor. Enter the studio
+       passcode to carry on.</p>
+
+    <form method="POST" action="/api/hq/unlock" class="hq-unlock">
+      <label class="hq-sr" for="pass">Studio passcode</label>
+      <input id="pass" name="passcode" type="password" required autofocus
+             autocomplete="current-password" placeholder="Studio passcode"
+             enterkeyhint="go">
+      <button class="btn btn--primary btn--full" type="submit">Unlock</button>
+      {{error}}
+    </form>
+
+    <p class="hq-gate__foot">Ask Charley if you do not have it. Do not share it
+       outside the team — this page has door codes on it.</p>
+  </div>
+</main>
 </body>
 </html>
 `;
@@ -1072,4 +1116,12 @@ function render() {
   return PAGE;
 }
 
-module.exports = { render, version: "5e45d29ab9" };
+/* The lock screen, with an optional one-line complaint in it. */
+function lock(message) {
+  const note = message
+    ? `<p class="hq-wrong" role="alert">${String(message).replace(/[<>&"]/g, '')}</p>`
+    : '';
+  return LOCK.split('{{error}}').join(note);
+}
+
+module.exports = { render, lock, version: "8c9acf5d5a" };
