@@ -280,69 +280,6 @@
     });
   }
 
-  /* ── Bonus opt-in ────────────────────────────────────────────────── */
-  function bonus() {
-    var form = $('#hq-bonus-form');
-    if (!form) return;
-    var name = $('#bn-name', form);
-    var code = $('#bn-code', form);
-    var out = $('#hq-bonus-status');
-    var button = $('button[type="submit"]', form);
-    var edited = false;
-
-    /* Suggest FIRSTNAME20 as they type, but stop the moment they take it over
-       — a suggestion that keeps overwriting what you typed is worse than none. */
-    code.addEventListener('input', function () {
-      edited = true;
-      var clean = code.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      if (clean !== code.value) {
-        var at = code.selectionStart;
-        code.value = clean;
-        try { code.setSelectionRange(at - 1, at - 1); } catch (e) { /* older browsers */ }
-      }
-    });
-
-    name.addEventListener('input', function () {
-      if (edited && code.value) return;
-      var first = name.value.trim().split(/\s+/)[0] || '';
-      var clean = first.toUpperCase().replace(/[^A-Z0-9]/g, '');
-      code.value = clean ? clean + '20' : '';
-    });
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var data = new FormData(form);
-      out.textContent = 'Sending\u2026';
-      out.removeAttribute('data-tone');
-      button.disabled = true;
-
-      fetch('/api/hq/bonus', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          name: data.get('name'),
-          email: data.get('email'),
-          location: data.get('location'),
-          code: data.get('code'),
-          ack_requirements: data.get('ack_requirements') === 'on',
-        }),
-      })
-        .then(function (r) { return r.json().then(function (b) { return { ok: r.ok, body: b }; }); })
-        .then(function (result) {
-          if (!result.ok) throw new Error(result.body.error || 'Could not record it.');
-          form.innerHTML =
-            '<p><strong>You are opted in.</strong> Charley will confirm your code' +
-            ' and you will get a breakdown at the end of each quarter.</p>';
-        })
-        .catch(function (err) {
-          out.textContent = err.message;
-          out.setAttribute('data-tone', 'bad');
-        })
-        .finally(function () { button.disabled = false; });
-    });
-  }
-
   /* ── Report an issue ─────────────────────────────────────────────── */
   function issues() {
     var form = $('#hq-issue-form');
@@ -388,6 +325,5 @@
   accordions();
   copying();
   issues();
-  bonus();
   events();
 })();

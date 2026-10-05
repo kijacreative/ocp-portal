@@ -16,8 +16,8 @@ const PAGE = `<!DOCTYPE html>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Khand:wght@400;500;600;700&family=Montserrat:wght@300;400;600;700;900&display=swap">
 <link rel="stylesheet" href="/css/tokens.css">
-<link rel="stylesheet" href="/css/base.css?v=5447556c09">
-<link rel="stylesheet" href="/css/portal.css?v=5447556c09">
+<link rel="stylesheet" href="/css/base.css?v=5e45d29ab9">
+<link rel="stylesheet" href="/css/portal.css?v=5e45d29ab9">
 </head>
 
 <body class="hq">
@@ -342,7 +342,7 @@ const PAGE = `<!DOCTYPE html>
     <div class="hq-sec__head">
       <div class="hq-eyebrow">06 — Your pay, on top of class pay</div>
       <h2 class="hq-h2">Trainer quarterly bonus<span class="hq-flag">Launches October 1</span></h2>
-      <p>Official details coming soon. Opt in below to be included.</p>
+      <p>Official details coming soon. Speak to Charley to be included.</p>
     </div>
 
     <div class="hq-card">
@@ -427,60 +427,6 @@ const PAGE = `<!DOCTYPE html>
       </ul>
     </div>
 
-    <!-- ── opt-in ──────────────────────────────────────────────────── -->
-    <div class="hq-card" style="margin-top:28px" id="bonus-optin">
-      <div class="hq-eyebrow">Opt in to the program</div>
-      <h3 class="hq-h3" style="margin:10px 0 0">Read the requirements above, then confirm below</h3>
-      <p class="hq-note" style="margin-top:12px">You can ask Charley anything before signing.</p>
-
-      <form class="hq-form" id="hq-bonus-form">
-        <div class="hq-row">
-          <div class="hq-field">
-            <label for="bn-name">Full name</label>
-            <input id="bn-name" name="name" type="text" required maxlength="80" autocomplete="name">
-          </div>
-          <div class="hq-field">
-            <label for="bn-email">Email</label>
-            <input id="bn-email" name="email" type="email" required maxlength="120" autocomplete="email">
-          </div>
-        </div>
-        <div class="hq-row">
-          <div class="hq-field">
-            <label for="bn-loc">Primary location</label>
-            <select id="bn-loc" name="location" required>
-              <option value="">Choose…</option>
-              <option>Bishop Arts</option>
-              <option>Uptown</option>
-              <option>Lower Greenville</option>
-              <option>Multiple</option>
-            </select>
-          </div>
-          <div class="hq-field">
-            <label for="bn-code">Desired promo code</label>
-            <input id="bn-code" name="code" type="text" required maxlength="24"
-                   pattern="[A-Z0-9]+" autocomplete="off" spellcheck="false"
-                   aria-describedby="bn-code-hint">
-            <p class="hq-note" id="bn-code-hint" style="margin-top:7px">Letters and numbers only.
-              We suggest one from your first name — change it if you want something else.</p>
-          </div>
-        </div>
-
-        <fieldset style="border:0;padding:0;margin:0">
-          <legend class="hq-eyebrow" style="margin-bottom:10px">Confirm each of these</legend>
-          <label class="hq-check" style="align-items:flex-start">
-            <input type="checkbox" name="ack_requirements" required style="margin-top:4px">
-            <span>I have read the base and selective requirements and understand I must meet
-              all four base requirements and two of four selective requirements to earn a
-              tier bonus.</span>
-          </label>
-        </fieldset>
-
-        <div class="hq-form__foot">
-          <button class="btn btn--primary" type="submit">Opt in</button>
-          <span class="hq-say-status" id="hq-bonus-status" role="status" aria-live="polite"></span>
-        </div>
-      </form>
-    </div>
   </section>
 
   <!-- ══ 06 CLASSES ═════════════════════════════════════════════════ -->
@@ -1101,7 +1047,7 @@ const PAGE = `<!DOCTYPE html>
   </main>
 </div>
 
-<script src="/js/portal.js?v=5447556c09" defer></script>
+<script src="/js/portal.js?v=5e45d29ab9" defer></script>
 </body>
 </html>
 `;
@@ -1110,4 +1056,4 @@ function render() {
   return PAGE;
 }
 
-module.exports = { render, version: "5447556c09" };
+module.exports = { render, version: "5e45d29ab9" };
