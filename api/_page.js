@@ -387,12 +387,13 @@ const PAGE = `<!DOCTYPE html>
         </ol>
       </div>
       <div class="hq-card">
-        <div class="hq-eyebrow">Selective requirements — two of three required</div>
+        <div class="hq-eyebrow">Selective requirements — two of four required</div>
         <ol class="hq-steps">
           <li>Attend an <strong>OCP all-staff event</strong> held during the quarter.</li>
           <li>Receive an <strong>attributable 5-star review</strong> or other validated positive
             client feedback. Forward it in rather than expecting us to find it.</li>
           <li>Attend an <strong>OCP professional-development session</strong>.</li>
+          <li>Attend a <strong>content session with the social media team</strong>.</li>
         </ol>
       </div>
     </div>
@@ -468,7 +469,7 @@ const PAGE = `<!DOCTYPE html>
           <label class="hq-check" style="align-items:flex-start">
             <input type="checkbox" name="ack_requirements" required style="margin-top:4px">
             <span>I have read the base and selective requirements and understand I must meet
-              all four base requirements and two of three selective requirements to earn a
+              all four base requirements and two of four selective requirements to earn a
               tier bonus.</span>
           </label>
         </fieldset>
