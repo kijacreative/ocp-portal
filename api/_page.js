@@ -379,8 +379,7 @@ const PAGE = `<!DOCTYPE html>
             request count as classes not taught, including elective travel.</li>
           <li><strong>Sub at least 2 classes</strong> outside your own schedule.</li>
           <li><strong>Zero no-shows and zero documented late arrivals.</strong> On site 15
-            minutes before your first class; under 10 minutes is a late arrival. A late arrival
-            counts only if it is logged the same day and you are told within 48 hours.
+            minutes before your first class; under 10 minutes is a late arrival.
             <strong>Q4 2026 is a grace quarter</strong> — lates are logged and communicated
             but do not disqualify.</li>
           <li><strong>Sign at least [1] new member</strong> during the quarter using your
