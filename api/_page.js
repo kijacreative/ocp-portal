@@ -389,7 +389,8 @@ const PAGE = `<!DOCTYPE html>
       <div class="hq-card">
         <div class="hq-eyebrow">Selective requirements — two of four required</div>
         <ol class="hq-steps">
-          <li>Attend an <strong>OCP all-staff event</strong> held during the quarter.</li>
+          <li><strong>Attend, participate in or help at an OCP event</strong> held during
+            the quarter.</li>
           <li>Receive an <strong>attributable 5-star review</strong> or other validated positive
             client feedback. Forward it in rather than expecting us to find it.</li>
           <li>Attend an <strong>OCP professional-development session</strong>.</li>
