@@ -61,6 +61,7 @@ const PAGE = `<!DOCTYPE html>
       standard, what is on the calendar, and what we are pushing right now.</p>
     <div class="hq-quick">
       <a href="https://app.arketa.co" target="_blank" rel="noopener">Open Arketa</a>
+      <a href="#access">Door codes</a>
       <a href="#studio-issue">Report a studio issue</a>
       <a href="#offers">Current offers</a>
       <a href="https://docs.google.com/document/d/1qxPZ9cg-ST7CLNCK0TYsXTntPhKJD_P5Ir9E-gJal04/edit" target="_blank" rel="noopener">Handbook</a>
@@ -654,13 +655,28 @@ const PAGE = `<!DOCTYPE html>
   <!-- ══ 07 STUDIO ══════════════════════════════════════════════════ -->
   <section class="hq-sec" id="studio">
     <div class="hq-sec__head">
-      <div class="hq-eyebrow">08 — Studio maintenance</div>
-      <h2 class="hq-h2">Opening, closing &amp; upkeep</h2>
+      <div class="hq-eyebrow">08 — Studio access &amp; maintenance</div>
+      <h2 class="hq-h2">Getting in, opening, closing</h2>
       <p>The studio should look the same to the 7am client and the 7pm client. If something
         needs attention, post it — do not leave it for whoever is on next to discover.</p>
     </div>
 
-    <div class="hq-grid hq-grid--2">
+    <div class="hq-card" id="access">
+      <div class="hq-eyebrow">Studio access</div>
+      <h3 class="hq-h3" style="margin:10px 0 0">Door codes</h3>
+      <div class="hq-codes">
+        <div><span class="hq-code">1997</span><p>Door code. <span>All three studios.</span></p></div>
+        <div><span class="hq-code">0196</span><p>Trash door. <span>Bishop Arts only.</span></p></div>
+      </div>
+      <p class="hq-note" style="margin-top:14px">Need your own key? Email
+        <a href="mailto:charley@oakcliffpilates.com">charley@oakcliffpilates.com</a>. Keys live
+        on the Master Lock — always put one back before you leave.</p>
+      <p class="hq-note" style="margin-top:10px"><strong>These codes are for staff.</strong>
+        Do not give them to a client, and do not forward this page outside the team.</p>
+    </div>
+
+    <h3 class="hq-h4" style="margin-top:32px">Opening &amp; closing</h3>
+    <div class="hq-grid hq-grid--2" style="margin-top:14px">
       <div class="hq-card">
         <div class="hq-eyebrow">Opening</div>
         <ul class="hq-list">
