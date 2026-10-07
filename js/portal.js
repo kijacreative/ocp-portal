@@ -158,12 +158,6 @@
       })
       .join('');
 
-    var share = event.ticketUrl
-      ? '<b>Share link</b><a href="' + esc(event.ticketUrl) + '" target="_blank" rel="noopener">' +
-        esc(event.ticketUrl.replace(/^https?:\/\//, '')) + '</a>' +
-        '<button type="button" class="hq-copy" data-copy="' + esc(event.ticketUrl) + '">Copy</button>'
-      : '<b>Share link</b><em>Not in the sheet yet — add one in the event tab’s Ticket Link row.</em>';
-
     var scope = event.instructors
       .filter(function (p) { return p.scope; })
       .map(function (p) {
@@ -182,7 +176,6 @@
       (event.discounts ? '<p>' + esc(event.discounts) + '</p>' : '') +
       '<div class="hq-meta">' + meta + '</div>' +
       (scope ? '<ul class="hq-list">' + scope + '</ul>' : '') +
-      '<div class="hq-event__share">' + share + '</div>' +
       '</div></article>'
     );
   }
@@ -280,50 +273,8 @@
     });
   }
 
-  /* ── Report an issue ─────────────────────────────────────────────── */
-  function issues() {
-    var form = $('#hq-issue-form');
-    if (!form) return;
-    var out = $('#hq-issue-status');
-    var button = $('button[type="submit"]', form);
-
-    form.addEventListener('submit', function (e) {
-      e.preventDefault();
-      var data = new FormData(form);
-      out.textContent = 'Posting…';
-      out.removeAttribute('data-tone');
-      button.disabled = true;
-
-      fetch('/api/hq/issue', {
-        method: 'POST',
-        credentials: 'same-origin',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          reporter: data.get('reporter'),
-          location: data.get('location'),
-          area: data.get('area'),
-          detail: data.get('detail'),
-          urgent: data.get('urgent') === 'on',
-        }),
-      })
-        .then(function (r) { return r.json().then(function (body) { return { ok: r.ok, body: body }; }); })
-        .then(function (result) {
-          if (!result.ok) throw new Error(result.body.error || 'Could not log it.');
-          out.textContent = 'Logged in the studio issues sheet. Thank you.';
-          out.setAttribute('data-tone', 'ok');
-          form.reset();
-        })
-        .catch(function (err) {
-          out.textContent = err.message;
-          out.setAttribute('data-tone', 'bad');
-        })
-        .finally(function () { button.disabled = false; });
-    });
-  }
-
   nav();
   accordions();
   copying();
-  issues();
   events();
 })();
