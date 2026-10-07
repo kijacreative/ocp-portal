@@ -758,12 +758,19 @@ const PAGE = `<!DOCTYPE html>
     <div class="hq-grid hq-grid--2" style="margin-top:14px">
       <div class="hq-card hq-card--plain">
         <div class="hq-eyebrow">Parking while you work</div>
-        <h3 class="hq-h3" style="margin:10px 0 0">We register your car for you</h3>
+        <h3 class="hq-h3" style="margin:10px 0 0">Register at every studio you teach at</h3>
         <p class="hq-note" style="margin-top:12px">Trainer parking is not the same as the
-          client validation. Add your <strong>license plate and email</strong> to the
-          <a href="https://docs.google.com/spreadsheets/d/1_7FqfdOD5ot_pJqKSSyLkjy7-XJK1obEK_iwb9Fgds8/edit" target="_blank" rel="noopener">license plate sheet</a>
-          and you will be set up at the studios you teach at. Do this before your first shift —
-          anything odd, ask <a href="mailto:Charley@oakcliffpilates.com">Charley@oakcliffpilates.com</a>.</p>
+          client validation, and each garage signs you up its own way. Do this before your
+          first shift at that studio.</p>
+        <ul class="hq-list">
+          <li><strong>Lower Greenville and Bishop Arts:</strong> add your car to the
+            <a href="https://docs.google.com/spreadsheets/d/1_7FqfdOD5ot_pJqKSSyLkjy7-XJK1obEK_iwb9Fgds8/edit" target="_blank" rel="noopener">license plate sheet</a>.</li>
+          <li><strong>Bishop Arts:</strong> you will also get a separate invite — watch for it.</li>
+          <li><strong>Uptown:</strong> fill in the
+            <a href="https://forms.office.com/Pages/ResponsePage.aspx?id=yIQN2Pj-MkWIKQomOzIV7JRsrnjKEUtIvnVa412lbP5UNDAwS1NXOUNSQ0xaU1hZOFJGTFpEVDRaNC4u" target="_blank" rel="noopener">Uptown parking form</a>.</li>
+        </ul>
+        <p class="hq-note" style="margin-top:14px">Anything odd, ask
+          <a href="mailto:Charley@oakcliffpilates.com">Charley@oakcliffpilates.com</a>.</p>
       </div>
       <div class="hq-card hq-card--plain">
         <div class="hq-eyebrow">Payroll</div>
